@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taldangra Fulmati High School (H.S.) - Staff Pattern Master (52 Posts)</title>
+<style>
+:root{
+  --primary-color:#1b365d; --secondary-color:#4b6b94; --accent-color:#f39c12;
+  --bg-color:#f4f7f6; --card-bg:#ffffff; --text-color:#333333; --border-color:#cbd5e1;
+  --vacant-bg:#fff4e5; --vacant-text:#b45309; --filled-bg:#eafaf1; --filled-text:#0f766e;
+}
+*{box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:20px;background:var(--bg-color);color:var(--text-color);}
+.container{max-width:1500px;margin:0 auto;}
+header{background:var(--primary-color);color:#fff;padding:20px;border-radius:8px;text-align:center;margin-bottom:20px;box-shadow:0 4px 6px rgba(0,0,0,.1);}
+header h1{margin:0 0 8px;font-size:22px;}
+header p{margin:4px 0;font-size:13px;opacity:.95;}
+.school-info-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:15px;background:#e2e8f0;padding:10px;border-radius:6px;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:20px;}
+.nav-tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.tab-btn{background:#cbd5e1;border:none;padding:10px 18px;font-weight:600;border-radius:5px;cursor:pointer;transition:.3s;font-size:13px;}
+.tab-btn.active{background:var(--primary-color);color:#fff;}
+.controls-card{background:var(--card-bg);padding:16px 20px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,.05);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;}
+.control-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:200px;}
+label{font-weight:600;font-size:12px;color:var(--primary-color);}
+select,input,textarea{padding:9px;border:1px solid var(--border-color);border-radius:5px;font-size:13px;outline:none;width:100%;font-family:inherit;}
+select:focus,input:focus,textarea:focus{border-color:var(--primary-color);}
+.table-container{background:var(--card-bg);border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,.05);overflow-x:auto;padding:10px;}
+table{width:100%;border-collapse:collapse;font-size:12px;text-align:left;}
+th,td{padding:9px 10px;border-bottom:1px solid var(--border-color);vertical-align:top;}
+th{background:var(--primary-color);color:#fff;text-transform:uppercase;font-size:10.5px;letter-spacing:.5px;position:sticky;top:0;}
+tr:hover{background:#f1f4f8;}
+.badge{padding:3px 8px;border-radius:4px;font-size:10.5px;font-weight:700;}
+.badge-filled{background:var(--filled-bg);color:var(--filled-text);}
+.badge-vacant{background:var(--vacant-bg);color:var(--vacant-text);}
+.badge-subgroup{background:#e0f2fe;color:#0369a1;}
+.row-vacant td{background:#fffaf2;}
+.view-section{display:none;} .view-section.active{display:block;}
+.btn{background:var(--primary-color);color:#fff;border:none;padding:9px 16px;border-radius:5px;cursor:pointer;font-weight:600;font-size:12.5px;transition:.3s;white-space:nowrap;}
+.btn:hover{background:var(--secondary-color);}
+.btn-small{padding:5px 10px;font-size:11px;}
+.btn-warn{background:#b45309;} .btn-warn:hover{background:#92400e;}
+.btn-fill{background:#0f766e;} .btn-fill:hover{background:#0b5c55;}
+.btn-cancel{background:#64748b;} .btn-cancel:hover{background:#475569;}
+.btn-danger{background:#b91c1c;} .btn-danger:hover{background:#7f1d1d;}
+.inline-form{background:#f8fafc;border:2px dashed var(--primary-color);border-radius:8px;padding:14px;margin:6px 0;}
+.inline-form .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:10px;}
+.inline-form .actions{display:flex;gap:8px;}
+.summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:20px;}
+.summary-card{background:var(--card-bg);border-radius:8px;padding:14px;box-shadow:0 2px 5px rgba(0,0,0,.05);border-left:5px solid var(--primary-color);}
+.summary-card h4{margin:0 0 8px;font-size:12.5px;color:var(--primary-color);text-transform:uppercase;letter-spacing:.4px;}
+.summary-card .nums{display:flex;justify-content:space-between;font-size:12px;font-weight:600;}
+.summary-card .nums span.vac{color:var(--vacant-text);}
+.summary-card .nums span.fil{color:var(--filled-text);}
+.summary-total{background:var(--primary-color);color:#fff;border-left-color:var(--accent-color);}
+.summary-total h4{color:#fff;}
+.summary-total .nums span{color:#fff !important;}
+.section-label-row td{background:var(--primary-color);color:#fff;font-weight:700;text-align:center;letter-spacing:.5px;padding:6px;}
+.document-box{background:#fff;padding:40px;border:8px solid var(--primary-color);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);max-width:800px;margin:0 auto;position:relative;}
+.doc-header{text-align:center;border-bottom:2px solid var(--primary-color);padding-bottom:15px;margin-bottom:25px;}
+.doc-header h2{margin:0;color:var(--primary-color);font-size:22px;letter-spacing:1px;}
+.doc-header p{margin:4px 0;font-size:12.5px;color:#555;}
+.doc-body{font-size:15px;line-height:1.8;color:#333;margin-bottom:30px;}
+.synopsis-box{background:#f8fafc;border:1px solid #cbd5e1;padding:15px;border-radius:6px;margin:15px 0;font-size:13.5px;}
+.synopsis-box table{width:100%;white-space:normal;}
+.synopsis-box td{padding:5px 10px;border-bottom:1px dashed #e2e8f0;}
+.doc-footer{display:flex;justify-content:space-between;margin-top:50px;}
+.signature-line{border-top:1px solid #333;width:200px;text-align:center;padding-top:5px;font-weight:600;}
+.staff-pattern-box{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,.05);}
+.pattern-table{width:100%;border-collapse:collapse;font-size:10.5px;text-align:center;}
+.pattern-table th,.pattern-table td{border:1px solid #94a3b8;padding:5px 6px;}
+.pattern-table th{background:#1b365d;color:#fff;font-size:10px;}
+.pattern-header-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;font-size:11.5px;font-weight:600;background:#e2e8f0;padding:12px;border-radius:6px;}
+.vacant-cell{font-weight:700;color:var(--vacant-text);letter-spacing:2px;}
+.small-note{font-size:11px;color:#64748b;margin-top:4px;}
+.help-banner{background:#e0f2fe;border:1px solid #7dd3fc;color:#075985;padding:10px 14px;border-radius:6px;font-size:12.5px;margin-bottom:16px;}
+.hoi-banner{background:var(--primary-color);color:#fff;font-weight:700;text-align:center;padding:10px;border-radius:6px;margin:22px 0 14px;letter-spacing:.5px;font-size:14.5px;}
+.hoi-refline{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:14px;}
+.hoi-table{width:100%;border-collapse:collapse;font-size:11.5px;margin:14px 0;}
+.hoi-table th,.hoi-table td{border:1px solid #94a3b8;padding:6px 7px;text-align:center;}
+.hoi-table th{background:var(--primary-color);color:#fff;font-size:10.5px;}
+.hoi-table td.name-cell{text-align:left;font-weight:700;}
+.hoi-sign{display:flex;justify-content:flex-end;margin:36px 0 24px;}
+.hoi-sign .signature-line{width:220px;}
+@media print{
+  @page{size:A4 landscape;margin:10mm 8mm;}
+  body *{visibility:hidden;}
+  .printable-area,.printable-area *{visibility:visible;}
+  .printable-area{position:absolute;left:0;top:0;width:100%;border:none;box-shadow:none;padding:0;margin:0;}
+  .no-print{display:none !important;}
+
+  /* ---- Staff Pattern sheet: fit cleanly page-by-page on A4 ---- */
+  #printablePattern .pattern-table{font-size:9.5px;width:100%;table-layout:fixed;}
+  #printablePattern .pattern-table th,#printablePattern .pattern-table td{padding:4px 5px;word-wrap:break-word;}
+  #printablePattern thead{display:table-header-group;}       /* repeat column headers on every printed page */
+  #printablePattern tr{page-break-inside:avoid;break-inside:avoid;}
+  #printablePattern .section-label-row{page-break-after:avoid;break-after:avoid;}
+  #printablePattern table{page-break-inside:auto;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="no-print">
+    <h1>Taldangra Fulmati High School (H.S.)</h1>
+    <p>Staff Pattern Master (52 Sanctioned Posts) — Add / Vacate / Fill, Certificates & NOC Generator</p>
+  </header>
+
+  <div class="school-info-bar no-print">
+    <span>OSMS Code: 2007277</span> | <span>DISE Code: 19132104401</span> | <span>Index: U1-083</span> | <span>HS Code: 114071</span>
+  </div>
+
+  <div class="nav-tabs no-print">
+    <button class="tab-btn active" onclick="switchView('pattern',event)">Staff Pattern Sheet (52 Posts)</button>
+    <button class="tab-btn" onclick="switchView('manage',event)">Manage Staff (Add / Vacate / Fill)</button>
+    <button class="tab-btn" onclick="switchView('database',event)">Staff Database & Search</button>
+    <button class="tab-btn" onclick="switchView('certificate',event)">NOC cum Experience Certificate</button>
+    <button class="tab-btn" onclick="switchView('noc',event)">NOC for Examination</button>
+    <button class="tab-btn" onclick="switchView('hoi',event)">H.O.I. Report / Admin Order</button>
+  </div>
+
+  <!-- SUMMARY BAR (auto-calculated, shown on all tabs) -->
+  <div class="summary-bar no-print" id="summaryBar"></div>
+
+  <!-- VIEW: STAFF PATTERN SHEET (52 POSTS, A4 landscape) -->
+  <div id="patternView" class="view-section active">
+    <div class="controls-card no-print">
+      <p style="margin:0;font-weight:600;color:var(--primary-color);">Exact 52-post pattern — filled posts show full staff data; vacant posts show reason & subject required.</p>
+      <button class="btn" onclick="window.print()">Print Staff Pattern (Landscape)</button>
+    </div>
+    <div id="printablePattern" class="staff-pattern-box printable-area">
+      <div style="text-align:center;margin-bottom:12px;">
+        <h3 style="margin:0;color:var(--primary-color);">STAFF PATTERN — AS ON <span id="patternDate"></span></h3>
+        <h4 style="margin:5px 0;color:#333;">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h4>
+        <p style="margin:0;font-size:11.5px;">Block: Taldangra | Sub-Division: Khatra | UDISE Code: 19132104401 | OSMS Code: 2007277 | Index: U1-083 | HS Code: 114071</p>
+      </div>
+      <div class="pattern-header-info" id="patternHeaderInfo"></div>
+      <table class="pattern-table">
+        <thead><tr>
+          <th>S.No</th><th>Name of the Staff</th><th>Designation</th><th>Approved Qualifications</th>
+          <th>Subject Taught</th><th>Date of Appointment</th><th>Approval No & Date</th><th>Date of Birth</th>
+          <th>Gender</th><th>Category</th><th>Remarks</th><th>Medium</th>
+        </tr></thead>
+        <tbody id="patternTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VIEW: MANAGE STAFF -->
+  <div id="manageView" class="view-section">
+    <div class="help-banner no-print">
+      Use <strong>Fill Post</strong> to appoint a new staff member against a vacant sanctioned post. Use <strong>Retired / Transferred / Resigned / Terminated / Other</strong> to vacate a filled post — the post automatically becomes VACANT with the reason recorded, and stays part of the 52 sanctioned posts (it does not disappear).
+    </div>
+    <div class="controls-card no-print">
+      <div class="control-group">
+        <label>Filter by Status:</label>
+        <select id="manageStatusFilter" onchange="renderManageTable()">
+          <option value="">All Posts (52)</option>
+          <option value="Filled">Filled Only</option>
+          <option value="Vacant">Vacant Only</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Search:</label>
+        <input type="text" id="manageSearch" placeholder="Search name, section, subject..." onkeyup="renderManageTable()">
+      </div>
+      <div>
+        <button class="btn btn-cancel" onclick="resetToOriginalData()">Reset All Data to Original</button>
+      </div>
+    </div>
+    <div class="table-container">
+      <table id="manageTable">
+        <thead><tr>
+          <th>S.No</th><th>Section</th><th>Status</th><th>Name / Post</th><th>Designation</th>
+          <th>Subject</th><th>Mobile No</th><th>Remarks</th><th class="no-print">Action</th>
+        </tr></thead>
+        <tbody id="manageTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VIEW: STAFF DATABASE -->
+  <div id="databaseView" class="view-section">
+    <div class="controls-card no-print">
+      <div class="control-group">
+        <label for="subGroupFilter">Filter by Section:</label>
+        <select id="subGroupFilter" onchange="onSubGroupChange()">
+          <option value="">All Sections</option>
+          <option value="HEADMASTER / GENERAL">HEADMASTER / GENERAL</option>
+          <option value="LANGUAGE GROUP">LANGUAGE GROUP</option>
+          <option value="SCIENCE GROUP">SCIENCE GROUP</option>
+          <option value="SOCIAL SCIENCE GROUP">SOCIAL SCIENCE GROUP</option>
+          <option value="WORK EDUCATION GROUP">WORK EDUCATION GROUP</option>
+          <option value="HIGHER SECONDARY">HIGHER SECONDARY</option>
+          <option value="NON-TEACHING">NON-TEACHING</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="staffDropdown">Select Particular Staff Profile:</label>
+        <select id="staffDropdown" onchange="onStaffDropdownSelect()"><option value="">-- Choose Staff Member --</option></select>
+      </div>
+      <div class="control-group">
+        <label for="searchInput">Search Records:</label>
+        <input type="text" id="searchInput" placeholder="Search by name, qualification..." onkeyup="filterTable()">
+      </div>
+      <div><button class="btn" onclick="resetFilters()">Reset View</button></div>
+    </div>
+    <div class="table-container">
+      <table id="staffTable">
+        <thead><tr>
+          <th>S.No</th><th>Section</th><th>Status</th><th>Name of Staff</th><th>Designation</th><th>Emp Code</th>
+          <th>Qualifications</th><th>Subject Taught</th><th>1st DOJ</th><th>Approval No & Date</th><th>DOB</th>
+          <th>DOR</th><th>Gender</th><th>Category</th><th>Mobile No</th><th>Previous Service</th><th>Remarks</th><th>Medium</th>
+        </tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VIEW: EXPERIENCE CERTIFICATE -->
+  <div id="certificateView" class="view-section">
+    <div class="controls-card no-print">
+      <div class="control-group" style="max-width:400px;">
+        <label for="certStaffSelect">Select Staff for NOC cum Experience Certificate:</label>
+        <select id="certStaffSelect" onchange="generateCertificate()"><option value="">-- Select Staff Member --</option></select>
+      </div>
+      <div class="control-group" style="max-width:400px;">
+        <label for="certExam">Examination / Purpose (for NOC clause):</label>
+        <input type="text" id="certExam" value="2nd SLST-2025 (Secondary & Higher Secondary)" oninput="generateCertificate()">
+      </div>
+      <div><button class="btn" onclick="window.print()">Print / Save Certificate</button></div>
+    </div>
+    <div id="printableCert" class="document-box printable-area">
+      <div class="doc-header">
+        <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
+        <p>Block: Taldangra | Sub-Division: Khatra | Bankura, West Bengal</p>
+        <p>OSMS Code: 2007277 | DISE Code: 19132104401 | Index: U1-083 | HS Code: 114071</p>
+        <p style="margin-top:12px;font-weight:bold;font-size:16px;text-decoration:underline;">NO OBJECTION CERTIFICATE (NOC) CUM TEACHING EXPERIENCE CERTIFICATE</p>
+      </div>
+      <div class="doc-body" id="certBodyContent"><p style="text-align:center;color:#775;"><i>Please select a staff member from the dropdown above to generate the certificate and service synopsis.</i></p></div>
+      <div class="doc-footer">
+        <div><p>Date: <span id="certCurrentDate"></span></p><p>Place: Taldangra</p></div>
+        <div style="text-align:center;"><div class="signature-line"></div><p style="margin:5px 0 0;font-size:14px;">Headmaster / Secretary</p><p style="margin:0;font-size:12px;">Taldangra Fulmati High School (H.S.)</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: NOC -->
+  <div id="nocView" class="view-section">
+    <div class="controls-card no-print">
+      <div class="control-group">
+        <label for="nocStaffSelect">Select Staff (Auto-fill Full Data) or Enter Manually Below:</label>
+        <select id="nocStaffSelect" onchange="populateNocFromStaff()"><option value="">-- Choose Staff Member or Type Below --</option></select>
+      </div>
+      <div><button class="btn" onclick="window.print()">Print / Save NOC</button></div>
+    </div>
+    <div class="controls-card no-print">
+      <div class="control-group"><label>Staff Name:</label><input type="text" id="manualName" placeholder="Enter staff full name" oninput="updateNocDisplay()"></div>
+      <div class="control-group"><label>Designation:</label><input type="text" id="manualDesignation" placeholder="e.g. Assistant Teacher" oninput="updateNocDisplay()"></div>
+      <div class="control-group"><label>Emp Code:</label><input type="text" id="manualEmpCode" placeholder="e.g. XYZ1234" oninput="updateNocDisplay()"></div>
+      <div class="control-group"><label>Mobile No:</label><input type="text" id="manualMobile" placeholder="10-digit mobile" oninput="updateNocDisplay()"></div>
+      <div class="control-group"><label>Examination Name / Details:</label><input type="text" id="manualExam" placeholder="e.g. State Level Competitive Exam / Higher Studies" oninput="updateNocDisplay()"></div>
+    </div>
+
+    <!-- Staff details synopsis is generated FIRST, before the NOC letter -->
+    <div class="controls-card no-print" id="nocSynopsisWrap" style="display:none;">
+      <div class="synopsis-box" style="width:100%;">
+        <h4 style="margin:0 0 10px;color:#1b365d;text-decoration:underline;">STAFF DETAILS (verified before NOC issue)</h4>
+        <table>
+          <tr><td><strong>Name & Emp Code:</strong></td><td id="nocSynName"></td></tr>
+          <tr><td><strong>Designation:</strong></td><td id="nocSynDesig"></td></tr>
+          <tr><td><strong>Mobile No:</strong></td><td id="nocSynMobile"></td></tr>
+          <tr><td><strong>Date of Birth:</strong></td><td id="nocSynDob"></td></tr>
+          <tr><td><strong>Date of Retirement (DOR):</strong></td><td id="nocSynDor"></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div id="printableNoc" class="document-box printable-area" style="margin-top:20px;">
+      <div class="doc-header">
+        <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
+        <p>Block: Taldangra | Sub-Division: Khatra | Bankura, West Bengal</p>
+        <p>OSMS Code: 2007277 | DISE Code: 19132104401 | Index: U1-083 | HS Code: 114071</p>
+        <p style="margin-top:12px;font-weight:bold;font-size:16px;text-decoration:underline;">NO OBJECTION CERTIFICATE (NOC) FOR EXAMINATION</p>
+      </div>
+      <div class="doc-body">
+        <p style="text-align:right;"><strong>Date:</strong> <span id="nocCurrentDate"></span></p>
+        <p style="text-align:right;"><strong>Memo No:</strong> TFHS/NOC/2026/___</p><br>
+        <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+        <p style="text-align:justify;margin-top:15px;">
+          This is to certify that <strong><span id="displayNocName">________________________</span></strong>, holding Employee Code <strong><span id="displayNocEmpCode">____________</span></strong>, Mobile No. <strong><span id="displayNocMobile">__________</span></strong>, and serving as an <strong><span id="displayNocDesignation">____________________</span></strong> in <strong>Taldangra Fulmati High School (H.S.)</strong> (OSMS Code: 2007277, DISE Code: 19132104401, Index: U1-083, HS Code: 114071), has completed necessary administrative formalities.
+        </p>
+        <p style="text-align:justify;margin-top:15px;">
+          This school authority has <strong>no objection</strong> if he/she appears in <strong><span id="displayNocExam">________________________________________________</span></strong> or applies for the same, subject to the condition that his/her school duties and institutional responsibilities are not hampered.
+        </p>
+        <p style="text-align:justify;margin-top:15px;">We wish him/her every success in the examination and future endeavors.</p>
+      </div>
+      <div class="doc-footer">
+        <div><p>Place: Taldangra</p></div>
+        <div style="text-align:center;"><div class="signature-line"></div><p style="margin:5px 0 0;font-size:14px;">Headmaster</p><p style="margin:0;font-size:12px;">Taldangra Fulmati High School (H.S.)</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: H.O.I. REPORT cum ADMINISTRATOR ORDER -->
+  <div id="hoiView" class="view-section">
+    <div class="help-banner no-print">
+      Tick the teachers below who have applied for NOC to sit an examination — their particulars auto-populate both the Headmaster's Report and the Administrator's Order below.
+    </div>
+    <div class="controls-card no-print">
+      <div class="control-group">
+        <label for="hoiReportNo">H.O.I. Report No:</label>
+        <input type="text" id="hoiReportNo" value="TFHS/HOI-RPT/2026/07" oninput="renderHoiDoc()">
+      </div>
+      <div class="control-group">
+        <label for="hoiAdmnNo">Administrator Order No:</label>
+        <input type="text" id="hoiAdmnNo" value="TFHS/ADMN-ORD/2026/07" oninput="renderHoiDoc()">
+      </div>
+      <div class="control-group">
+        <label for="hoiExam">Examination / Purpose:</label>
+        <input type="text" id="hoiExam" value="2nd SLST-2025 (Secondary & Higher Secondary)" oninput="renderHoiDoc()">
+      </div>
+      <div><button class="btn" onclick="window.print()">Print Report &amp; Order</button></div>
+    </div>
+    <div class="controls-card no-print" style="flex-direction:column;align-items:flex-start;">
+      <label style="margin-bottom:8px;">Select Teachers Seeking NOC:</label>
+      <div id="hoiCheckboxList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+    <div class="document-box printable-area" style="max-width:950px;">
+      <div class="doc-header">
+        <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
+        <p>Block: Taldangra | Sub-Division: Khatra | Bankura, West Bengal</p>
+        <p>OSMS Code: 2007277 | DISE Code: 19132104401 | Index: U1-083 | HS Code: 114071</p>
+      </div>
+      <div id="hoiDocContent"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================= SECTION META ============================= */
+const SECTION_META = {
+  HM:       {label:'HEADMASTER / GENERAL', group:'NORMAL', designation:'H.M.'},
+  LANGUAGE: {label:'LANGUAGE GROUP',        group:'NORMAL', designation:'A.T.'},
+  SCIENCE:  {label:'SCIENCE GROUP',         group:'NORMAL', designation:'A.T.'},
+  SOCIAL:   {label:'SOCIAL SCIENCE GROUP',  group:'NORMAL', designation:'A.T.'},
+  WORKEDU:  {label:'WORK EDUCATION GROUP',  group:'NORMAL', designation:'A.T.'},
+  HS:       {label:'HIGHER SECONDARY',      group:'HS',     designation:'A.T.'},
+  LIBRARIAN:{label:'NON-TEACHING',          group:'LIB',    designation:'Librarian'},
+  CLERK:    {label:'NON-TEACHING',          group:'CLERK',  designation:'Clerk'},
+  GRD:      {label:'NON-TEACHING',          group:'GRD',    designation:'Gr.-D'}
+};
+const GROUP_META = {
+  NORMAL:{label:'Normal Section incl HM'}, HS:{label:'H.S. Section'}, LIB:{label:'Librarian'},
+  CLERK:{label:'Clerk'}, GRD:{label:'Peon (Gr.-D) / Lab Attendant'}
+};
+const SECTION_ORDER = ['HM','LANGUAGE','SCIENCE','SOCIAL','WORKEDU','HS','LIBRARIAN','CLERK','GRD'];
+
+/* ============================= DEFAULT 52-POST DATA ============================= */
+function defaultPosts(){
+return [
+{id:1,sec:'HM',sno:1,name:'PRABIR KUMAR DANGAR',desig:'H.M.',empCode:'JVMK0539',qual:'M.Sc.(Math),B.Ed.',subj:'N.A.',doa:'25-07-2019',appr:'2252/S;dt.02.08.19',dob:'10-04-1969',gender:'M',cat:'Gen',mobile:'9933035811',prevService:'JHILIMILI H.S. [06.10.97-20.04.05]; CHAKSYAMPUR J.P.H.S. [21.04.2005-24.07.2019]',remarks:'',medium:'Bengali',status:'Filled'},
+
+{id:2,sec:'LANGUAGE',sno:2,name:'SAMPA PATI',desig:'A.T.',empCode:'VWYY4294',qual:'B.A(ENG), B.ED',subj:'English',doa:'09-01-2019',appr:'278/S Dt 28.01.19',dob:'26-03-1992',gender:'F',cat:'Gen',mobile:'6294548679',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:3,sec:'LANGUAGE',sno:3,name:'SAHADEB BASKEY',desig:'A.T.',empCode:'TVZU4697',qual:'M.A.(Beng),B.Ed.',subj:'Bengali',doa:'07-07-2011',appr:'2309/S dt.29.7.11',dob:'21-11-1980',gender:'M',cat:'S.T.',mobile:'9932046355',prevService:'DHAMSA P.C. SEN INSTITUTION [18.05.2005-04.07.2011]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:4,sec:'LANGUAGE',sno:4,name:'TANMOY CHAKRABORTY',desig:'A.T.',empCode:'PTHV6090',qual:'M.A.(Eng),B.Ed.',subj:'English',doa:'01-07-2011',appr:'2189/S dt.25.7.11',dob:'02-11-1982',gender:'M',cat:'Gen',mobile:'9732010723',prevService:'BIBARDA S. VIDYAPITH [05.07.2005-30.06.2011]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:5,sec:'LANGUAGE',sno:5,name:'MAHIM KUMAR PAINE',desig:'A.T.',empCode:'WMAO0787',qual:'M.A.(Beng),B.Ed.',subj:'Bengali',doa:'11-09-2008',appr:'3181/S dt.31.10.08',dob:'02-08-1982',gender:'M',cat:'Gen',mobile:'9433414565',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:6,sec:'LANGUAGE',sno:6,name:'SUJATA MAHATA',desig:'A.T.',empCode:'XHFX8193',qual:'M.A.(Beng),B.Ed.',subj:'Bengali',doa:'29-11-2013',appr:'51/S dt.03.01.14',dob:'30-03-1984',gender:'F',cat:'Gen',mobile:'9474191547',prevService:'BAHIRI PURNIMA GIRLS H.S. [09.08.2010-28.11.2013]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:7,sec:'LANGUAGE',sno:7,name:'VACANT',desig:'',empCode:'',qual:'',subj:'SANTHALI',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:8,sec:'LANGUAGE',sno:8,name:'PARTHA MISHRA',desig:'A.T.',empCode:'AHFT9812',qual:'B.A.(Eng),B.Ed',subj:'English',doa:'16-11-2017',appr:'4802/Sdt.08.12.17',dob:'12-02-1990',gender:'M',cat:'Gen',mobile:'9475371396',prevService:'TEJHATI JASMANTA HIGH SCHOOL [02.12.2013-15.11.2017]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:9,sec:'LANGUAGE',sno:9,name:'ANTARA GHORAI',desig:'A.T.',empCode:'ABAE7411',qual:'B.A.(Sans),B.Ed',subj:'Sanskrit',doa:'20-02-2021',appr:'543/S; 02-03-2021',dob:'07-12-1978',gender:'F',cat:'Gen',mobile:'9434524410',prevService:'Saluipahari High School [11.04.2005-19.02.2021]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:10,sec:'LANGUAGE',sno:10,name:'VACANT',desig:'',empCode:'',qual:'',subj:'ENGLISH',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:11,sec:'LANGUAGE',sno:11,name:'VACANT',desig:'',empCode:'',qual:'',subj:'ENGLISH',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:12,sec:'LANGUAGE',sno:12,name:'VACANT',desig:'',empCode:'',qual:'',subj:'SANTHALI',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+
+{id:13,sec:'SCIENCE',sno:13,name:'VACANT',desig:'',empCode:'',qual:'',subj:'L.SC',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:"Released of Sanjoy Dangar on 1.12.25 in compliance with the Hon'ble S. C. Order in SLP No. 9586 of 2024",medium:'Bengali',status:'Vacant'},
+{id:14,sec:'SCIENCE',sno:14,name:'SABYASACHI MANDAL',desig:'A.T.',empCode:'YHZN6632',qual:'M.Sc.,B.Ed.',subj:'PSC/ PURE SC',doa:'04-01-2022',appr:'66/S, dt.06.01.22',dob:'16-02-1982',gender:'M',cat:'Gen',mobile:'9609556152',prevService:'GARH RAIPUR H S [20.09.2007-03.01.2022]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:15,sec:'SCIENCE',sno:15,name:'VACANT',desig:'',empCode:'',qual:'',subj:'Mathematics',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'Retirement of Tapas Kumar Gorai on 29.02.24',medium:'Bengali',status:'Vacant'},
+{id:16,sec:'SCIENCE',sno:16,name:'PARTHA KUMAR PATRA',desig:'A.T.',empCode:'HKQT4659',qual:'B.Sc.,B.Ed.',subj:'PSC/ PURE SC',doa:'04-10-2007',appr:'3295/Sdt.29.10.07',dob:'19-06-1983',gender:'M',cat:'Gen',mobile:'9002535438',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:17,sec:'SCIENCE',sno:17,name:'VACANT',desig:'',empCode:'',qual:'',subj:'PSC/ PURE SC',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:18,sec:'SCIENCE',sno:18,name:'VACANT',desig:'',empCode:'',qual:'',subj:'PSC/ PURE SC',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:19,sec:'SCIENCE',sno:19,name:'VACANT',desig:'',empCode:'',qual:'',subj:'L.SC',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:20,sec:'SCIENCE',sno:20,name:'VACANT',desig:'',empCode:'',qual:'',subj:'MATHEMATICS',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+
+{id:21,sec:'SOCIAL',sno:21,name:'SHEPHALI MAJI',desig:'A.T.',empCode:'HWFI9336',qual:'B.A. ,B.ED',subj:'Geography',doa:'29-06-2022',appr:'1953/S;04-07-2022',dob:'13-11-1977',gender:'F',cat:'S.C.',mobile:'9474502670',prevService:'Lakshmisagar Bijoy Vidyaniketan [02.05.2001-28.06.2022]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:22,sec:'SOCIAL',sno:22,name:'SWAPAN KUMAR MAJI',desig:'A.T.',empCode:'OTCJ3577',qual:'B.A(Hons).,B.Ed.',subj:'Geography',doa:'28-06-1997',appr:'2540/Sdt.31.07.97',dob:'25-11-1970',gender:'M',cat:'S.C.',mobile:'9434521097',prevService:'BHEDUA H.S [01.01.1992-27.06.1997]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:23,sec:'SOCIAL',sno:23,name:'VACANT',desig:'',empCode:'',qual:'',subj:'GEOGRAPHY',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:24,sec:'SOCIAL',sno:24,name:'VACANT',desig:'',empCode:'',qual:'',subj:'HISTORY',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+
+{id:25,sec:'WORKEDU',sno:25,name:'VACANT',desig:'',empCode:'',qual:'',subj:'W.E.',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'Retirement of Madhumita Maiti on 31.01.2016',medium:'Bengali',status:'Vacant'},
+{id:26,sec:'WORKEDU',sno:26,name:'KANTI MALLA',desig:'A.T.',empCode:'UVJO0237',qual:'B.A.; B.PED.',subj:'P.E.',doa:'13-11-2021',appr:'2246/S; 24-11-2021',dob:'06-04-1984',gender:'M',cat:'S.C.',mobile:'9749483481',prevService:'AKARBAID L B S HIGH SCHOOL [03.10.2008-12.11.2021]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:27,sec:'WORKEDU',sno:27,name:'DIPTIMAN SAHA',desig:'A.T.',empCode:'JDMU7116',qual:'B.A.; B.PED.',subj:'P.E.',doa:'29-06-2022',appr:'1954/S;04-07-2022',dob:'28-03-1980',gender:'M',cat:'S.C.',mobile:'9732148608',prevService:'Kharikasuli Madhabpur J H S [24.09.2008-28.06.2022]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:28,sec:'WORKEDU',sno:28,name:'VACANT',desig:'',empCode:'',qual:'',subj:'P.E.',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:29,sec:'WORKEDU',sno:29,name:'VACANT',desig:'',empCode:'',qual:'',subj:'P.E.',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+
+{id:30,sec:'HS',sno:30,name:'SUMANTA MANDAL',desig:'A.T.',empCode:'KAZD4948',qual:'M.Sc.(Math),B.Ed.',subj:'Mathematics',doa:'12-09-2018',appr:'3762/S dt 05.10.18',dob:'03-12-1990',gender:'M',cat:'S.C',mobile:'8436065805',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:31,sec:'HS',sno:31,name:'VACANT',desig:'',empCode:'',qual:'',subj:'Chemistry',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'Retirement of Ranjan Kumar Ghosh on 31.01.2025',medium:'Bengali',status:'Vacant'},
+{id:32,sec:'HS',sno:32,name:'VACANT',desig:'',empCode:'',qual:'',subj:'History',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'Retirement of Amal Chandra Sarda on 31.05.2026',medium:'Bengali',status:'Vacant'},
+{id:33,sec:'HS',sno:33,name:'PAPIYA MAJI',desig:'A.T.',empCode:'AMAF7542',qual:'M.A.(Eng),B.Ed.',subj:'English',doa:'11-09-2018',appr:'3762/S dt 05.10.18',dob:'16-05-1991',gender:'F',cat:'Gen',mobile:'8101162370',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:34,sec:'HS',sno:34,name:'SWAPNA MAHANTI',desig:'A.T.',empCode:'NCIZ8216',qual:'M.Sc.(Phys),B.Ed.',subj:'PHYSICS',doa:'24-09-2021',appr:'1787/S ;05-10-2021',dob:'12-10-1978',gender:'F',cat:'Gen',mobile:'7407377173',prevService:'SARENGA GIRLS H S [07.09.2009-23.09.2021]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:35,sec:'HS',sno:35,name:'BELA MAHATA',desig:'A.T.',empCode:'LPCT9358',qual:'M.Sc.(Bot),B.Ed',subj:'Biology',doa:'23-12-2014',appr:'204/S dt.16.01.15',dob:'02-07-1974',gender:'F',cat:'Gen',mobile:'9563514172',prevService:'MEJHIA H.S [14.10.2004-22.12.2014]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:36,sec:'HS',sno:36,name:'KABITA MANDAL',desig:'A.T.',empCode:'TUEO5927',qual:'M.A.(Beng),B.Ed',subj:'Bengali',doa:'01-09-2008',appr:'3181/S dt.31.10.08',dob:'06-04-1981',gender:'F',cat:'SC',mobile:'9434481805',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:37,sec:'HS',sno:37,name:'TAPAS KUNDU',desig:'A.T.',empCode:'XTCJ8807',qual:'M.C.A.,B.Ed.',subj:'COMA',doa:'30-01-2009',appr:'585/S dt.24.02.09',dob:'25-09-1969',gender:'M',cat:'OBC-B',mobile:'9475217459',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:38,sec:'HS',sno:38,name:'BIDHAN CHANDRA GHOSH',desig:'A.T.',empCode:'AXYN2334',qual:'M.Sc.(Chem),B.Ed.',subj:'Chemistry',doa:'01-09-2009',appr:'2711/S dt.8.10.09',dob:'17-01-1983',gender:'M',cat:'Gen',mobile:'7001316846',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:39,sec:'HS',sno:39,name:'MRINMAYEE CHAKRABORTY',desig:'A.T.',empCode:'MEAB3695',qual:'M.A.(Sans),B.Ed',subj:'Sanskrit',doa:'27-10-2009',appr:'127/S dt.11.01.10',dob:'18-02-1982',gender:'F',cat:'Gen',mobile:'9732356211',prevService:'CHAK-RASUL SIKSHA NIKETAN [15.10.2007-26.10.2009]',remarks:'',medium:'Bengali',status:'Filled'},
+{id:40,sec:'HS',sno:40,name:'VACANT',desig:'',empCode:'',qual:'',subj:'Political Science',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'Retirement of Kanai Lal Ghosh on 31.01.2023',medium:'Bengali',status:'Vacant'},
+{id:41,sec:'HS',sno:41,name:'MALATI TUDU',desig:'A.T.',empCode:'FBJW5262',qual:'M.A.(Santali),B.Ed.',subj:'SANTHALI (PG)',doa:'26-02-2021',appr:'712/Sdt.10.03.21',dob:'16-11-1992',gender:'F',cat:'ST',mobile:'9775601340',prevService:'None',remarks:'',medium:'Santhali',status:'Filled'},
+{id:42,sec:'HS',sno:42,name:'SASANKA SAREN',desig:'A.T.',empCode:'XOFX4098',qual:'M.A.(Santali),B.Ed.',subj:'SANTHALI (PG)',doa:'26-02-2021',appr:'712/Sdt.10.03.21',dob:'09-02-1994',gender:'M',cat:'ST',mobile:'9064795247',prevService:'None',remarks:'',medium:'Santhali',status:'Filled'},
+{id:43,sec:'HS',sno:43,name:'VACANT',desig:'',empCode:'',qual:'',subj:'SANTHALI (PG)',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+{id:44,sec:'HS',sno:44,name:'VACANT',desig:'',empCode:'',qual:'',subj:'SANTHALI (PG)',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'New Post',medium:'Santhali',status:'Vacant'},
+
+{id:45,sec:'LIBRARIAN',sno:1,name:'TUHIN SUBHRA PATRA',desig:'Librarian',empCode:'VCDS2789',qual:'B.A. , BLIS',subj:'N.A.',doa:'17-09-2021',appr:'1793/S ;05-10-2021',dob:'14-01-1979',gender:'M',cat:'Gen',mobile:'9932591525',prevService:'KUNCHIA HIGH SCHOOL [05.04.2012-16.09.2021]',remarks:'',medium:'Bengali',status:'Filled'},
+
+{id:46,sec:'CLERK',sno:2,name:'VACANT',desig:'',empCode:'',qual:'',subj:'',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:'Retirement of Nirmal Chandra Nandi on 30.09.2021',medium:'Bengali',status:'Vacant'},
+{id:47,sec:'CLERK',sno:3,name:'VACANT',desig:'',empCode:'',qual:'',subj:'',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:"Terminated of service of Sumanta Dule on 03.04.25 consequent upon the Judgment dated 03.04.2025 of the Hon'ble S.C. in Civil Appeal No. 4800 of 2025.",medium:'Bengali',status:'Vacant'},
+{id:48,sec:'CLERK',sno:4,name:'SUBHENDU KARMAKAR',desig:'Clerk',empCode:'YTTP2941',qual:'M.P.',subj:'N.A.',doa:'14-03-2000',appr:'1220/Sdt.04.05.2K',dob:'07-10-1966',gender:'M',cat:'Gen',mobile:'9475347007',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+
+{id:49,sec:'GRD',sno:5,name:'VACANT',desig:'',empCode:'',qual:'',subj:'',doa:'',appr:'',dob:'',gender:'',cat:'',mobile:'',prevService:'',remarks:"Terminated of service of Keya Dey on 03.04.25 consequent upon the Judgment dated 03.04.2025 of the Hon'ble S.C. in Civil Appeal No. 4800 of 2025.",medium:'Bengali',status:'Vacant'},
+{id:50,sec:'GRD',sno:6,name:'TAPAN KUMAR DIYASI',desig:'Gr.-D',empCode:'VTXO9847',qual:'VIII-Passed',subj:'N.A.',doa:'14-03-1995',appr:'1086/Sdt.03.05.95',dob:'25-02-1974',gender:'M',cat:'Gen',mobile:'9732188801',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:51,sec:'GRD',sno:7,name:'NIRANJAN MURMU',desig:'Gr.-D',empCode:'BBGV1929',qual:'VIII-Passed',subj:'N.A.',doa:'12-05-1998',appr:'1403/Sdt.23.07.98',dob:'01-01-1976',gender:'M',cat:'S.T.',mobile:'9641298955',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'},
+{id:52,sec:'GRD',sno:8,name:'PRAKASH SARDAR',desig:'Gr.-D',empCode:'PCHJ4347',qual:'M.P.',subj:'N.A.',doa:'21-11-2012',appr:'4848/S dt.31.12.12',dob:'27-07-1985',gender:'M',cat:'S.T.',mobile:'9002374924',prevService:'None',remarks:'',medium:'Bengali',status:'Filled'}
+];
+}
+
+/* ============================= STATE / PERSISTENCE ============================= */
+const STORAGE_KEY = 'tfhs_staff_posts_v1';
+let staffData = [];
+let editingId = null, vacatingId = null, fillingId = null;
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    staffData = raw ? JSON.parse(raw) : defaultPosts();
+  }catch(e){ staffData = defaultPosts(); }
+}
+function saveData(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(staffData)); }catch(e){}
+}
+function resetToOriginalData(){
+  if(!confirm('This will discard all edits (fills/vacancies/corrections) and restore the original 52-post pattern as supplied. Continue?')) return;
+  staffData = defaultPosts();
+  saveData();
+  renderAll();
+}
+
+/* ============================= DATE / CALC HELPERS ============================= */
+function parseDMY(str){
+  if(!str || str.length < 8) return null;
+  const p = str.split('-'); if(p.length!==3) return null;
+  const d=parseInt(p[0],10), m=parseInt(p[1],10), y=parseInt(p[2],10);
+  if(!d||!m||!y) return null;
+  return new Date(y, m-1, d);
+}
+function formatDMY(date){
+  const d=String(date.getDate()).padStart(2,'0'), m=String(date.getMonth()+1).padStart(2,'0'), y=date.getFullYear();
+  return `${d}-${m}-${y}`;
+}
+// FIX: correct DOR = last day of the month in which the employee turns 60 (WB Govt superannuation rule)
+function calculateRetirement(dobStr){
+  const dob = parseDMY(dobStr);
+  if(!dob) return 'N.A.';
+  const retireYear = dob.getFullYear() + 60;
+  const dor = new Date(retireYear, dob.getMonth()+1, 0); // last day of that month
+  return formatDMY(dor);
+}
+function calculateExperience(dateStr){
+  const doj = parseDMY(dateStr);
+  if(!doj) return 'N.A.';
+  const today = new Date();
+  let diffDays = Math.floor(Math.abs(today - doj) / (1000*60*60*24));
+  let years = Math.floor(diffDays/365);
+  let months = Math.floor((diffDays%365)/30);
+  let days = (diffDays%365)%30;
+  return `${years} years, ${months} months, ${days} days (approx)`;
+}
+function desigFull(code){
+  return code==='H.M.' ? 'Headmaster' : code==='A.T.' ? 'Assistant Teacher' : (code || 'N.A.');
+}
+
+/* ============================= SUMMARY (AUTO-CALCULATE 52 vs EXISTING) ============================= */
+function computeSummary(){
+  const groups = {}; // group -> {sanctioned, filled}
+  Object.values(GROUP_META).forEach((g,i)=>{});
+  Object.keys(GROUP_META).forEach(g=>groups[g]={sanctioned:0, filled:0});
+  staffData.forEach(p=>{
+    const g = SECTION_META[p.sec].group;
+    groups[g].sanctioned++;
+    if(p.status==='Filled') groups[g].filled++;
+  });
+  return groups;
+}
+function renderSummaryBar(){
+  const groups = computeSummary();
+  const bar = document.getElementById('summaryBar');
+  let totalSanctioned=0, totalFilled=0;
+  let html = '';
+  Object.keys(GROUP_META).forEach(g=>{
+    const s = groups[g].sanctioned, f = groups[g].filled, v = s-f;
+    totalSanctioned += s; totalFilled += f;
+    html += `<div class="summary-card"><h4>${GROUP_META[g].label}</h4>
+      <div class="nums"><span>Sanctioned: ${s}</span><span class="fil">Filled: ${f}</span><span class="vac">Vacant: ${v}</span></div></div>`;
+  });
+  const totalVacant = totalSanctioned-totalFilled;
+  html = `<div class="summary-card summary-total"><h4>TOTAL SANCTIONED POSTS</h4>
+      <div class="nums"><span>Sanctioned: ${totalSanctioned}</span><span>Filled: ${totalFilled}</span><span>Vacant: ${totalVacant}</span></div></div>` + html;
+  bar.innerHTML = html;
+
+  // pattern tab header info + date
+  document.getElementById('patternDate').textContent = new Date().toLocaleDateString('en-GB').split('/').join('-');
+  document.getElementById('patternHeaderInfo').innerHTML =
+    `<div>Teaching Staff: Normal Section incl HM (Sanctioned: ${groups.NORMAL.sanctioned}, In Position: ${groups.NORMAL.filled}, Vacant: ${groups.NORMAL.sanctioned-groups.NORMAL.filled}) | H.S. Section (Sanctioned: ${groups.HS.sanctioned}, In Position: ${groups.HS.filled}, Vacant: ${groups.HS.sanctioned-groups.HS.filled})</div>
+     <div>Librarian (Sanctioned: ${groups.LIB.sanctioned}, In Position: ${groups.LIB.filled}, Vacant: ${groups.LIB.sanctioned-groups.LIB.filled}) | Non-Teaching Clerk (Sanctioned: ${groups.CLERK.sanctioned}, In Position: ${groups.CLERK.filled}, Vacant: ${groups.CLERK.sanctioned-groups.CLERK.filled}) | Peon/Lab Attendant (Sanctioned: ${groups.GRD.sanctioned}, In Position: ${groups.GRD.filled}, Vacant: ${groups.GRD.sanctioned-groups.GRD.filled})</div>`;
+}
+
+/* ============================= TAB SWITCHING ============================= */
+function switchView(viewName, event){
+  document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById(viewName+'View').classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ============================= PATTERN TABLE (52 posts, exact format) ============================= */
+function renderPatternTable(){
+  const tbody = document.getElementById('patternTableBody');
+  tbody.innerHTML = '';
+  let lastSection = null;
+  SECTION_ORDER.forEach(secKey=>{
+    const posts = staffData.filter(p=>p.sec===secKey).sort((a,b)=>a.sno-b.sno);
+    const label = SECTION_META[secKey].label;
+    // insert a group label row when the displayed label changes (skip repeat for HM->none, and for LIB/CLERK/GRD show "NON-TEACHING" once)
+    if(label !== lastSection){
+      const tr = document.createElement('tr');
+      tr.className = 'section-label-row';
+      tr.innerHTML = `<td colspan="12">${label}</td>`;
+      if(secKey !== 'HM') tbody.appendChild(tr);
+      lastSection = label;
+    }
+    posts.forEach(p=>{
+      const tr = document.createElement('tr');
+      if(p.status==='Vacant') tr.className='row-vacant';
+      const nameCell = p.status==='Vacant' ? `<span class="vacant-cell">V A C A N T</span>` : `<strong>${p.name}</strong>`;
+      tr.innerHTML = `
+        <td>${p.sno}</td><td>${nameCell}</td><td>${p.desig||(p.status==='Vacant'?SECTION_META[secKey].designation:'')}</td>
+        <td>${p.qual||''}</td><td>${p.subj||''}</td><td>${p.doa||''}</td><td>${p.appr||''}</td>
+        <td>${p.dob||''}</td><td>${p.gender||''}</td><td>${p.cat||''}</td>
+        <td style="text-align:left;white-space:normal;">${p.remarks||''}</td><td>${p.medium||''}</td>`;
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+/* ============================= MANAGE TABLE (Add / Vacate / Fill) ============================= */
+function renderManageTable(){
+  const tbody = document.getElementById('manageTableBody');
+  const statusFilter = document.getElementById('manageStatusFilter').value;
+  const search = document.getElementById('manageSearch').value.toLowerCase();
+  tbody.innerHTML = '';
+
+  const rows = staffData.filter(p=>{
+    const matchStatus = !statusFilter || p.status===statusFilter;
+    const hay = `${p.name} ${SECTION_META[p.sec].label} ${p.subj} ${p.remarks}`.toLowerCase();
+    return matchStatus && hay.includes(search);
+  });
+
+  rows.forEach(p=>{
+    if(p.id===editingId){ tbody.appendChild(buildEditRow(p)); return; }
+    if(p.id===vacatingId){ tbody.appendChild(buildVacateRow(p)); return; }
+    if(p.id===fillingId){ tbody.appendChild(buildFillRow(p)); return; }
+
+    const tr = document.createElement('tr');
+    const statusBadge = p.status==='Filled' ? `<span class="badge badge-filled">FILLED</span>` : `<span class="badge badge-vacant">VACANT</span>`;
+    let actionBtns = '';
+    if(p.status==='Filled'){
+      actionBtns = `<button class="btn btn-small" onclick="startEdit(${p.id})">Edit</button>
+                    <button class="btn btn-small btn-warn" onclick="startVacate(${p.id})">Vacate</button>`;
+    } else {
+      actionBtns = `<button class="btn btn-small btn-fill" onclick="startFill(${p.id})">Fill Post</button>`;
+    }
+    tr.innerHTML = `
+      <td>${p.sno}</td><td><span class="badge badge-subgroup">${SECTION_META[p.sec].label}</span></td><td>${statusBadge}</td>
+      <td>${p.status==='Filled'?('<strong>'+p.name+'</strong>'):'<span class="vacant-cell">VACANT</span>'}</td>
+      <td>${p.desig||SECTION_META[p.sec].designation}</td><td>${p.subj||''}</td><td>${p.mobile||''}</td>
+      <td style="white-space:normal;max-width:220px;">${p.remarks||''}</td>
+      <td class="no-print">${actionBtns}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function fieldRow(label,id,value,type,placeholder){
+  return `<div><label style="display:block;font-size:11px;margin-bottom:3px;">${label}</label>
+    <input type="${type||'text'}" id="${id}" value="${value||''}" placeholder="${placeholder||''}"></div>`;
+}
+
+function buildEditRow(p){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td colspan="9">
+    <div class="inline-form">
+      <strong>Editing Post S.No ${p.sno} — ${SECTION_META[p.sec].label}</strong>
+      <div class="grid">
+        ${fieldRow('Name','ef_name',p.name)}
+        ${fieldRow('Designation','ef_desig',p.desig)}
+        ${fieldRow('Emp Code','ef_empCode',p.empCode)}
+        ${fieldRow('Mobile No','ef_mobile',p.mobile,'tel','10-digit mobile')}
+        ${fieldRow('Qualification','ef_qual',p.qual)}
+        ${fieldRow('Subject Taught','ef_subj',p.subj)}
+        ${fieldRow('Date of Appointment (DD-MM-YYYY)','ef_doa',p.doa)}
+        ${fieldRow('Approval No & Date','ef_appr',p.appr)}
+        ${fieldRow('Date of Birth (DD-MM-YYYY)','ef_dob',p.dob)}
+        ${fieldRow('Gender (M/F)','ef_gender',p.gender)}
+        ${fieldRow('Category','ef_cat',p.cat)}
+        ${fieldRow('Medium','ef_medium',p.medium)}
+        ${fieldRow('Previous Service','ef_prev',p.prevService)}
+        ${fieldRow('Remarks','ef_remarks',p.remarks)}
+      </div>
+      <div class="actions">
+        <button class="btn btn-fill" onclick="saveEdit(${p.id})">Save Changes</button>
+        <button class="btn btn-cancel" onclick="cancelInline()">Cancel</button>
+      </div>
+    </div>
+  </td>`;
+  return tr;
+}
+function startEdit(id){ vacatingId=null; fillingId=null; editingId=id; renderManageTable(); }
+function saveEdit(id){
+  const p = staffData.find(x=>x.id===id);
+  p.name = document.getElementById('ef_name').value.trim() || p.name;
+  p.desig = document.getElementById('ef_desig').value.trim();
+  p.empCode = document.getElementById('ef_empCode').value.trim();
+  p.mobile = document.getElementById('ef_mobile').value.trim();
+  p.qual = document.getElementById('ef_qual').value.trim();
+  p.subj = document.getElementById('ef_subj').value.trim();
+  p.doa = document.getElementById('ef_doa').value.trim();
+  p.appr = document.getElementById('ef_appr').value.trim();
+  p.dob = document.getElementById('ef_dob').value.trim();
+  p.gender = document.getElementById('ef_gender').value.trim().toUpperCase();
+  p.cat = document.getElementById('ef_cat').value.trim();
+  p.medium = document.getElementById('ef_medium').value.trim();
+  p.prevService = document.getElementById('ef_prev').value.trim();
+  p.remarks = document.getElementById('ef_remarks').value.trim();
+  editingId = null;
+  saveData(); renderAll();
+}
+
+function buildVacateRow(p){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td colspan="9">
+    <div class="inline-form">
+      <strong>Vacate Post — ${p.name} (S.No ${p.sno}, ${SECTION_META[p.sec].label})</strong>
+      <div class="grid">
+        <div><label style="display:block;font-size:11px;margin-bottom:3px;">Reason</label>
+          <select id="vf_reason">
+            <option value="Retirement">Retirement</option>
+            <option value="Transfer">Transfer</option>
+            <option value="Resignation">Resignation</option>
+            <option value="Termination">Termination of service</option>
+            <option value="Death">Death</option>
+            <option value="Deputation">Deputation</option>
+            <option value="Other">Other (type custom remark)</option>
+          </select>
+        </div>
+        ${fieldRow('Effective Date (DD-MM-YYYY)','vf_date','')}
+        ${fieldRow('Custom Remark (used if Other, or to append)','vf_custom','')}
+      </div>
+      <div class="actions">
+        <button class="btn btn-warn" onclick="confirmVacate(${p.id})">Confirm Vacate</button>
+        <button class="btn btn-cancel" onclick="cancelInline()">Cancel</button>
+      </div>
+    </div>
+  </td>`;
+  return tr;
+}
+function startVacate(id){ editingId=null; fillingId=null; vacatingId=id; renderManageTable(); }
+function confirmVacate(id){
+  const p = staffData.find(x=>x.id===id);
+  const reason = document.getElementById('vf_reason').value;
+  const date = document.getElementById('vf_date').value.trim();
+  const custom = document.getElementById('vf_custom').value.trim();
+  let remark;
+  if(reason==='Other'){
+    remark = custom || 'Post vacated';
+  } else {
+    const verbMap = {Retirement:'Retirement of',Transfer:'Transfer of',Resignation:'Resignation of',
+      Termination:'Termination of service of',Death:'Death of',Deputation:'Deputation of'};
+    remark = `${verbMap[reason]} ${p.name}${date?(' on '+date):''}`;
+    if(custom) remark += ` — ${custom}`;
+  }
+  const keptSubj = p.subj; const keptMedium = p.medium;
+  p.name='VACANT'; p.desig=''; p.empCode=''; p.qual=''; p.doa=''; p.appr=''; p.dob=''; p.gender='';
+  p.cat=''; p.mobile=''; p.prevService=''; p.subj=keptSubj; p.medium=keptMedium; p.remarks=remark; p.status='Vacant';
+  vacatingId = null;
+  saveData(); renderAll();
+}
+
+function buildFillRow(p){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td colspan="9">
+    <div class="inline-form">
+      <strong>Fill Vacant Post — S.No ${p.sno}, ${SECTION_META[p.sec].label} (Subject: ${p.subj||'N.A.'})</strong>
+      <div class="grid">
+        ${fieldRow('Full Name','ff_name','')}
+        ${fieldRow('Designation','ff_desig',SECTION_META[p.sec].designation)}
+        ${fieldRow('Emp Code','ff_empCode','')}
+        ${fieldRow('Mobile No','ff_mobile','','tel','10-digit mobile')}
+        ${fieldRow('Qualification','ff_qual','')}
+        ${fieldRow('Subject Taught','ff_subj',p.subj)}
+        ${fieldRow('Date of Appointment (DD-MM-YYYY)','ff_doa','')}
+        ${fieldRow('Approval No & Date','ff_appr','')}
+        ${fieldRow('Date of Birth (DD-MM-YYYY)','ff_dob','')}
+        ${fieldRow('Gender (M/F)','ff_gender','')}
+        ${fieldRow('Category','ff_cat','')}
+        ${fieldRow('Medium','ff_medium',p.medium)}
+        ${fieldRow('Previous Service (if any)','ff_prev','')}
+      </div>
+      <div class="actions">
+        <button class="btn btn-fill" onclick="confirmFill(${p.id})">Confirm Appointment</button>
+        <button class="btn btn-cancel" onclick="cancelInline()">Cancel</button>
+      </div>
+    </div>
+  </td>`;
+  return tr;
+}
+function startFill(id){ editingId=null; vacatingId=null; fillingId=id; renderManageTable(); }
+function confirmFill(id){
+  const p = staffData.find(x=>x.id===id);
+  const name = document.getElementById('ff_name').value.trim();
+  if(!name){ alert('Please enter the staff name.'); return; }
+  p.name = name.toUpperCase();
+  p.desig = document.getElementById('ff_desig').value.trim();
+  p.empCode = document.getElementById('ff_empCode').value.trim();
+  p.mobile = document.getElementById('ff_mobile').value.trim();
+  p.qual = document.getElementById('ff_qual').value.trim();
+  p.subj = document.getElementById('ff_subj').value.trim();
+  p.doa = document.getElementById('ff_doa').value.trim();
+  p.appr = document.getElementById('ff_appr').value.trim();
+  p.dob = document.getElementById('ff_dob').value.trim();
+  p.gender = document.getElementById('ff_gender').value.trim().toUpperCase();
+  p.cat = document.getElementById('ff_cat').value.trim();
+  p.medium = document.getElementById('ff_medium').value.trim();
+  p.prevService = document.getElementById('ff_prev').value.trim() || 'None';
+  p.remarks = '';
+  p.status = 'Filled';
+  fillingId = null;
+  saveData(); renderAll();
+}
+function cancelInline(){ editingId=null; vacatingId=null; fillingId=null; renderManageTable(); }
+
+/* ============================= DATABASE VIEW ============================= */
+function renderTable(data){
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  data.forEach(p=>{
+    const tr = document.createElement('tr');
+    if(p.status==='Vacant') tr.className='row-vacant';
+    const statusBadge = p.status==='Filled' ? `<span class="badge badge-filled">FILLED</span>` : `<span class="badge badge-vacant">VACANT</span>`;
+    tr.innerHTML = `
+      <td>${p.sno}</td><td><span class="badge badge-subgroup">${SECTION_META[p.sec].label}</span></td><td>${statusBadge}</td>
+      <td>${p.status==='Filled'?('<strong>'+p.name+'</strong>'):'<span class="vacant-cell">VACANT</span>'}</td>
+      <td>${p.desig||SECTION_META[p.sec].designation}</td><td><code>${p.empCode||''}</code></td>
+      <td>${p.qual||''}</td><td>${p.subj||'N.A.'}</td><td>${p.doa||''}</td><td>${p.appr||''}</td>
+      <td>${p.dob||''}</td><td>${p.dob?calculateRetirement(p.dob):''}</td><td>${p.gender||''}</td><td>${p.cat||''}</td>
+      <td>${p.mobile||''}</td><td><small>${p.prevService||''}</small></td><td>${p.remarks||''}</td><td>${p.medium||''}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+function filterTable(){
+  const subGroupVal = document.getElementById('subGroupFilter').value;
+  const searchVal = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = staffData.filter(p=>{
+    const matchSubGroup = !subGroupVal || SECTION_META[p.sec].label===subGroupVal;
+    const hay = Object.values(p).join(' ').toLowerCase() + ' ' + SECTION_META[p.sec].label.toLowerCase();
+    return matchSubGroup && hay.includes(searchVal);
+  });
+  renderTable(filtered);
+}
+function onSubGroupChange(){
+  const subGroupVal = document.getElementById('subGroupFilter').value;
+  const staffDropdown = document.getElementById('staffDropdown');
+  staffDropdown.innerHTML = '<option value="">-- Choose Staff Member --</option>';
+  const filtered = staffData.filter(p=>p.status==='Filled' && (!subGroupVal || SECTION_META[p.sec].label===subGroupVal));
+  filtered.forEach(p=>{
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.sno}. ${p.name} (${p.desig} - ${p.empCode||'N.A.'})`;
+    staffDropdown.appendChild(opt);
+  });
+  filterTable();
+}
+function onStaffDropdownSelect(){
+  const id = document.getElementById('staffDropdown').value;
+  if(!id) return;
+  const p = staffData.find(x=>x.id==id);
+  document.getElementById('searchInput').value = p.name;
+  filterTable();
+}
+function resetFilters(){
+  document.getElementById('subGroupFilter').value='';
+  document.getElementById('searchInput').value='';
+  onSubGroupChange();
+}
+
+/* ============================= DROPDOWNS (cert / noc) ============================= */
+function initializeDropdowns(){
+  const certStaffSelect = document.getElementById('certStaffSelect');
+  const nocStaffSelect = document.getElementById('nocStaffSelect');
+  certStaffSelect.innerHTML = '<option value="">-- Select Staff Member --</option>';
+  nocStaffSelect.innerHTML = '<option value="">-- Choose Staff Member or Type Below --</option>';
+  staffData.filter(p=>p.status==='Filled').forEach(p=>{
+    const opt2 = document.createElement('option'); opt2.value=p.id; opt2.textContent=`${p.name} (${p.empCode||'N.A.'}) - ${SECTION_META[p.sec].label}`;
+    certStaffSelect.appendChild(opt2);
+    const opt3 = document.createElement('option'); opt3.value=p.id; opt3.textContent=`${p.name} (${p.empCode||'N.A.'}) - ${p.desig}`;
+    nocStaffSelect.appendChild(opt3);
+  });
+  onSubGroupChange();
+  const todayStr = new Date().toLocaleDateString('en-GB');
+  document.getElementById('certCurrentDate').textContent = todayStr;
+  document.getElementById('nocCurrentDate').textContent = todayStr;
+}
+
+/* ============================= CERTIFICATE ============================= */
+function generateCertificate(){
+  const id = document.getElementById('certStaffSelect').value;
+  const certBody = document.getElementById('certBodyContent');
+  if(!id){ certBody.innerHTML = '<p style="text-align:center;color:#775;"><i>Please select a staff member from the dropdown above to generate the certificate and service synopsis.</i></p>'; return; }
+  const p = staffData.find(x=>x.id==id);
+  if(!p) return;
+  const dFull = desigFull(p.desig);
+  const joinDate = p.doa || 'N.A.';
+  const qual = p.qual || 'N.A.';
+  const sub = (p.subj && p.subj!=='N.A.' && p.subj!=='') ? `teaching ${p.subj}` : '';
+  const expAsOn = calculateExperience(joinDate);
+  const dor = calculateRetirement(p.dob);
+  const heShe = p.gender==='M' ? 'his' : 'her', HeShe = p.gender==='M' ? 'he' : 'she';
+  const himHer = p.gender==='M' ? 'him' : 'her';
+  const honorific = p.gender==='M' ? 'Sri' : 'Smt.';
+  const exam = (document.getElementById('certExam').value || 'the relevant competitive examination').trim();
+  certBody.innerHTML = `
+    <p style="text-align:justify;">This is to certify that <strong>${honorific} ${p.name}</strong> (Emp Code: <strong>${p.empCode||'N.A.'}</strong>), holding approval qualifications <strong>${qual}</strong>, has been serving as an <strong>${dFull}</strong> (${SECTION_META[p.sec].label}) ${sub} in <strong>Taldangra Fulmati High School (H.S.)</strong> since <strong>${joinDate}</strong>.</p>
+    <p style="text-align:justify;">During ${heShe} tenure in this institution, ${HeShe} has discharged ${heShe} duties with utmost sincerity, dedication, and professional competence. ${HeShe.charAt(0).toUpperCase()+HeShe.slice(1)} bears a good moral character and professional standing.</p>
+    <div class="synopsis-box">
+      <h4 style="margin:0 0 10px;color:#1b365d;text-decoration:underline;">OFFICIAL SERVICE SYNOPSIS</h4>
+      <table>
+        <tr><td><strong>Employee Name & Code:</strong></td><td>${p.name} (${p.empCode||'N.A.'})</td></tr>
+        <tr><td><strong>Designation & Section:</strong></td><td>${dFull} (${SECTION_META[p.sec].label})</td></tr>
+        <tr><td><strong>Subject Taught:</strong></td><td>${p.subj||'N.A.'}</td></tr>
+        <tr><td><strong>Mobile No:</strong></td><td>${p.mobile||'N.A.'}</td></tr>
+        <tr><td><strong>Date of Birth (DOB):</strong></td><td>${p.dob}</td></tr>
+        <tr><td><strong>Date of Retirement (DOR):</strong></td><td>${dor}</td></tr>
+        <tr><td><strong>1st Date of Joining (DOJ):</strong></td><td>${joinDate}</td></tr>
+        <tr><td><strong>Approval Details:</strong></td><td>${p.appr||'N.A.'}</td></tr>
+        <tr><td><strong>Category:</strong></td><td>${p.cat||'N.A.'}</td></tr>
+        <tr><td><strong>Previous Service Record:</strong></td><td>${p.prevService||'None'}</td></tr>
+        <tr><td><strong>Total Experience (as on date):</strong></td><td>${expAsOn}</td></tr>
+      </table>
+    </div>
+    <p style="text-align:justify;margin-top:15px;font-weight:700;color:#b45309;">NO OBJECTION</p>
+    <p style="text-align:justify;">This school authority has <strong>no objection</strong> if ${heShe==='his'?'he':'she'} appears in <strong>${exam}</strong>, or applies for the same, subject to the condition that ${heShe} school duties and institutional responsibilities are not hampered.</p>
+    <p style="text-align:justify;margin-top:15px;">We wish ${himHer} all success in ${heShe} future endeavors and career progression.</p>`;
+}
+
+/* ============================= NOC (staff details FIRST, then the letter) ============================= */
+function populateNocFromStaff(){
+  const id = document.getElementById('nocStaffSelect').value;
+  const wrap = document.getElementById('nocSynopsisWrap');
+  if(!id){ wrap.style.display='none'; return; }
+  const p = staffData.find(x=>x.id==id);
+  if(!p) return;
+  const dFull = desigFull(p.desig);
+
+  document.getElementById('manualName').value = p.name;
+  document.getElementById('manualDesignation').value = dFull;
+  document.getElementById('manualEmpCode').value = p.empCode || '';
+  document.getElementById('manualMobile').value = p.mobile || '';
+  document.getElementById('manualExam').value = 'Competitive Examination / Higher Studies';
+
+  // Staff details synopsis FIRST — with the corrected DOR calculation
+  document.getElementById('nocSynName').textContent = `${p.name} (${p.empCode||'N.A.'})`;
+  document.getElementById('nocSynDesig').textContent = `${dFull} — ${SECTION_META[p.sec].label}`;
+  document.getElementById('nocSynMobile').textContent = p.mobile || 'N.A.';
+  document.getElementById('nocSynDob').textContent = p.dob || 'N.A.';
+  document.getElementById('nocSynDor').textContent = p.dob ? calculateRetirement(p.dob) : 'N.A.';
+  wrap.style.display = 'block';
+
+  updateNocDisplay();
+}
+function updateNocDisplay(){
+  document.getElementById('displayNocName').textContent = document.getElementById('manualName').value || '________________________';
+  document.getElementById('displayNocDesignation').textContent = document.getElementById('manualDesignation').value || '____________________';
+  document.getElementById('displayNocEmpCode').textContent = document.getElementById('manualEmpCode').value || '____________';
+  document.getElementById('displayNocMobile').textContent = document.getElementById('manualMobile').value || '__________';
+  document.getElementById('displayNocExam').textContent = document.getElementById('manualExam').value || '________________________________________________';
+}
+
+/* ============================= H.O.I. REPORT cum ADMINISTRATOR ORDER ============================= */
+function renderHoiCheckboxList(){
+  const wrap = document.getElementById('hoiCheckboxList');
+  if(!wrap) return;
+  const checkedIds = new Set(Array.from(wrap.querySelectorAll('input[type=checkbox]:checked')).map(el=>el.value));
+  wrap.innerHTML = '';
+  staffData.filter(p=>p.status==='Filled').forEach(p=>{
+    const label = document.createElement('label');
+    label.style.cssText = 'display:flex;align-items:center;gap:6px;font-weight:500;font-size:12px;background:#f1f5f9;padding:6px 10px;border-radius:5px;cursor:pointer;';
+    const checked = checkedIds.has(String(p.id)) ? 'checked' : '';
+    label.innerHTML = `<input type="checkbox" value="${p.id}" onchange="renderHoiDoc()" ${checked}> ${p.name} (${SECTION_META[p.sec].label})`;
+    wrap.appendChild(label);
+  });
+  renderHoiDoc();
+}
+function getSelectedHoiStaff(){
+  const wrap = document.getElementById('hoiCheckboxList');
+  if(!wrap) return [];
+  const ids = Array.from(wrap.querySelectorAll('input[type=checkbox]:checked')).map(el=>el.value);
+  return staffData.filter(p=>ids.includes(String(p.id)));
+}
+function renderHoiDoc(){
+  const target = document.getElementById('hoiDocContent');
+  if(!target) return;
+  const sel = getSelectedHoiStaff();
+  const reportNo = (document.getElementById('hoiReportNo')||{}).value || '___________';
+  const admnNo = (document.getElementById('hoiAdmnNo')||{}).value || '___________';
+  const exam = (document.getElementById('hoiExam')||{}).value || '________________________________';
+  const today = new Date().toLocaleDateString('en-GB').split('/').join('-');
+
+  const rowsHtml = sel.map((p,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td class="name-cell">${p.name}</td>
+      <td>${p.appr||'N.A.'}</td>
+      <td>${p.subj||'N.A.'}</td>
+      <td>${p.doa||'N.A.'}</td>
+      <td>${SECTION_META[p.sec].label}</td>
+      <td>${p.mobile||'N.A.'}</td>
+    </tr>`).join('');
+
+  const tableHtml = sel.length ? `
+    <table class="hoi-table">
+      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval No & Date</th><th>Subject</th><th>Date of Appointment</th><th>Section</th><th>Mobile No</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>` : `<p style="text-align:center;color:#999;padding:14px 0;"><i>Tick one or more teachers above to populate the report and order.</i></p>`;
+
+  target.innerHTML = `
+    <div class="hoi-banner">REPORT OF THE HEAD OF THE INSTITUTION (H.O.I.)</div>
+    <div class="hoi-refline"><span>H.O.I. Report No.: ${reportNo}</span><span>Date: ${today}</span></div>
+    <p style="text-align:justify;">The following Assistant Teachers of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, have submitted applications seeking a <strong>No Objection Certificate (NOC)</strong> to appear in <strong>${exam}</strong>. Their particulars are furnished below for kind consideration:</p>
+    ${tableHtml}
+    <p style="text-align:justify;">The matter is respectfully placed before the Administrator / Competent Authority for kind consideration and necessary order, along with the applications and supporting documents of the above-named teachers.</p>
+    <div class="hoi-sign"><div style="text-align:center;"><div class="signature-line"></div><p style="margin:5px 0 0;font-size:14px;font-weight:700;">Headmaster</p><p style="margin:0;font-size:12px;">Taldangra Fulmati High School (H.S.)</p></div></div>
+
+    <div class="hoi-banner">ADMINISTRATOR ORDER</div>
+    <div class="hoi-refline"><span>Administrator Order No.: ${admnNo}</span><span>Date: ${today}</span></div>
+    <p style="text-align:justify;">In pursuance of the Report submitted by the Head of the Institution, the matter relating to the prayer for issuance of NOC in favour of the following teachers of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, has been duly placed, along with their applications and other relevant documents, for kind consideration:</p>
+    ${tableHtml}
+    <p style="text-align:justify;">After careful consideration of the above, permission is hereby accorded to the aforesaid teachers to appear in <strong>${exam}</strong>, for the relevant post(s) of Assistant Teacher as applicable to their subject and section.</p>
+    <p style="text-align:justify;">The Headmaster is hereby requested to issue the necessary No Objection Certificates (NOCs) to the above teachers accordingly.</p>
+    <p style="text-align:justify;"><i>This order is issued on the condition that the normal academic and administrative duties of the institution shall not be hampered in any manner.</i></p>
+    <div class="hoi-sign"><div style="text-align:center;"><div class="signature-line"></div><p style="margin:5px 0 0;font-size:14px;font-weight:700;">Administrator</p><p style="margin:0;font-size:12px;">Taldangra Fulmati High School (H.S.)</p></div></div>
+  `;
+}
+
+/* ============================= INIT ============================= */
+function renderAll(){
+  renderSummaryBar();
+  renderPatternTable();
+  renderManageTable();
+  initializeDropdowns();
+  filterTable();
+  renderHoiCheckboxList();
+}
+loadData();
+renderAll();
+</script>
+</body>
+</html>
