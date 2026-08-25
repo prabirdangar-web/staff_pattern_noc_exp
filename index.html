@@ -67,9 +67,9 @@ tr:hover{background:#f1f4f8;}
 .doc-footer{display:flex;justify-content:space-between;margin-top:50px;}
 .signature-line{border-top:1px solid #333;width:200px;text-align:center;padding-top:5px;font-weight:600;}
 .staff-pattern-box{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,.05);}
-.pattern-table{width:100%;border-collapse:collapse;font-size:10.5px;text-align:center;}
+.pattern-table{width:100%;border-collapse:collapse;font-size:10px;text-align:center;}
 .pattern-table th,.pattern-table td{border:1px solid #94a3b8;padding:5px 6px;}
-.pattern-table th{background:#1b365d;color:#fff;font-size:10px;}
+.pattern-table th{background:#1b365d;color:#fff;font-size:9.5px;}
 .pattern-header-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;font-size:11.5px;font-weight:600;background:#e2e8f0;padding:12px;border-radius:6px;}
 .vacant-cell{font-weight:700;color:var(--vacant-text);letter-spacing:2px;}
 .small-note{font-size:11px;color:#64748b;margin-top:4px;}
@@ -83,19 +83,17 @@ tr:hover{background:#f1f4f8;}
 .hoi-sign{display:flex;justify-content:flex-end;margin:36px 0 24px;}
 .hoi-sign .signature-line{width:220px;}
 @media print{
-  @page{size:A4 landscape;margin:10mm 8mm;}
+  @page{size:A4 portrait;margin:8mm 8mm;}
   body *{visibility:hidden;}
   .printable-area,.printable-area *{visibility:visible;}
   .printable-area{position:absolute;left:0;top:0;width:100%;border:none;box-shadow:none;padding:0;margin:0;}
   .no-print{display:none !important;}
 
-  /* ---- Staff Pattern sheet: fit cleanly page-by-page on A4 ---- */
-  #printablePattern .pattern-table{font-size:9.5px;width:100%;table-layout:fixed;}
-  #printablePattern .pattern-table th,#printablePattern .pattern-table td{padding:4px 5px;word-wrap:break-word;}
-  #printablePattern thead{display:table-header-group;}       /* repeat column headers on every printed page */
-  #printablePattern tr{page-break-inside:avoid;break-inside:avoid;}
-  #printablePattern .section-label-row{page-break-after:avoid;break-after:avoid;}
-  #printablePattern table{page-break-inside:auto;}
+  #printableCompact {font-size: 8px;}
+  #printableCompact table{font-size:8px;width:100%;table-layout:fixed;}
+  #printableCompact th,#printableCompact td{padding:3px 3px;word-wrap:break-word;}
+  #printableCompact thead{display:table-header-group;}
+  #printableCompact tr{page-break-inside:avoid;break-inside:avoid;}
 }
 </style>
 </head>
@@ -112,6 +110,7 @@ tr:hover{background:#f1f4f8;}
 
   <div class="nav-tabs no-print">
     <button class="tab-btn active" onclick="switchView('pattern',event)">Staff Pattern Sheet (52 Posts)</button>
+    <button class="tab-btn" onclick="switchView('compact',event)">Single-Page Master & PDF</button>
     <button class="tab-btn" onclick="switchView('manage',event)">Manage Staff (Add / Vacate / Fill)</button>
     <button class="tab-btn" onclick="switchView('database',event)">Staff Database & Search</button>
     <button class="tab-btn" onclick="switchView('certificate',event)">NOC cum Experience Certificate</button>
@@ -119,7 +118,7 @@ tr:hover{background:#f1f4f8;}
     <button class="tab-btn" onclick="switchView('hoi',event)">H.O.I. Report / Admin Order</button>
   </div>
 
-  <!-- SUMMARY BAR (auto-calculated, shown on all tabs) -->
+  <!-- SUMMARY BAR -->
   <div class="summary-bar no-print" id="summaryBar"></div>
 
   <!-- VIEW: STAFF PATTERN SHEET (52 POSTS, A4 landscape) -->
@@ -146,10 +145,59 @@ tr:hover{background:#f1f4f8;}
     </div>
   </div>
 
+  <!-- VIEW: COMPACT SINGLE-PAGE MASTER & PDF WITH FILTERS -->
+  <div id="compactView" class="view-section">
+    <div class="controls-card no-print">
+      <div class="control-group">
+        <label>Filter Status:</label>
+        <select id="compactStatusFilter" onchange="renderCompactTable()">
+          <option value="">All Status (Vacant & Existing)</option>
+          <option value="Filled">Existing / Filled Only</option>
+          <option value="Vacant">Vacant Only</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Filter Staff Type:</label>
+        <select id="compactTypeFilter" onchange="renderCompactTable()">
+          <option value="">All Types (Teaching & Non-Teaching)</option>
+          <option value="Teaching">Teaching Staff Only</option>
+          <option value="Non-Teaching">Non-Teaching Staff Only</option>
+        </select>
+      </div>
+      <div>
+        <button class="btn" onclick="window.print()">Print / Save Filtered PDF</button>
+      </div>
+    </div>
+    <div id="printableCompact" class="staff-pattern-box printable-area">
+      <div style="text-align:center;margin-bottom:10px;">
+        <h3 style="margin:0;color:var(--primary-color);">STAFF MASTER SHEET — AS ON <span id="compactDate"></span></h3>
+        <h4 style="margin:4px 0;color:#333;">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h4>
+        <p style="margin:0;font-size:10px;">OSMS Code: 2007277 | UDISE: 19132104401 | Index: U1-083</p>
+        <p id="compactFilterLabel" style="margin:4px 0 0;font-size:11px;font-weight:600;color:var(--secondary-color);"></p>
+      </div>
+      <table class="pattern-table">
+        <thead>
+          <tr>
+            <th style="width:4%;">Sl</th>
+            <th style="width:20%;">Staff Name</th>
+            <th style="width:13%;">Section</th>
+            <th style="width:10%;">Subject</th>
+            <th style="width:10%;">Mob No</th>
+            <th style="width:10%;">DOR</th>
+            <th style="width:8%;">Medium</th>
+            <th style="width:15%;">Remarks</th>
+            <th class="no-print" style="width:10%;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="compactTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- VIEW: MANAGE STAFF -->
   <div id="manageView" class="view-section">
     <div class="help-banner no-print">
-      Use <strong>Fill Post</strong> to appoint a new staff member against a vacant sanctioned post. Use <strong>Retired / Transferred / Resigned / Terminated / Other</strong> to vacate a filled post — the post automatically becomes VACANT with the reason recorded, and stays part of the 52 sanctioned posts (it does not disappear).
+      Use <strong>Fill Post</strong> to appoint a new staff member against a vacant sanctioned post. Use <strong>Retired / Transferred / Resigned / Terminated / Other</strong> to vacate a filled post — the post automatically becomes VACANT with the reason recorded, and stays part of the 52 sanctioned posts[cite: 1].
     </div>
     <div class="controls-card no-print">
       <div class="control-group">
@@ -164,8 +212,11 @@ tr:hover{background:#f1f4f8;}
         <label>Search:</label>
         <input type="text" id="manageSearch" placeholder="Search name, section, subject..." onkeyup="renderManageTable()">
       </div>
-      <div>
-        <button class="btn btn-cancel" onclick="resetToOriginalData()">Reset All Data to Original</button>
+      <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+        <button class="btn" onclick="exportToJson()">Export JSON</button>
+        <button class="btn btn-fill" onclick="triggerImport()">Import JSON</button>
+        <input type="file" id="importFileJson" style="display:none" accept=".json" onchange="importFromJson(event)">
+        <button class="btn btn-cancel" onclick="resetToOriginalData()">Reset Data</button>
       </div>
     </div>
     <div class="table-container">
@@ -262,7 +313,6 @@ tr:hover{background:#f1f4f8;}
       <div class="control-group"><label>Examination Name / Details:</label><input type="text" id="manualExam" placeholder="e.g. State Level Competitive Exam / Higher Studies" oninput="updateNocDisplay()"></div>
     </div>
 
-    <!-- Staff details synopsis is generated FIRST, before the NOC letter -->
     <div class="controls-card no-print" id="nocSynopsisWrap" style="display:none;">
       <div class="synopsis-box" style="width:100%;">
         <h4 style="margin:0 0 10px;color:#1b365d;text-decoration:underline;">STAFF DETAILS (verified before NOC issue)</h4>
@@ -302,7 +352,7 @@ tr:hover{background:#f1f4f8;}
     </div>
   </div>
 
-  <!-- VIEW: H.O.I. REPORT cum ADMINISTRATOR ORDER -->
+  <!-- VIEW: H.O.I. REPORT -->
   <div id="hoiView" class="view-section">
     <div class="help-banner no-print">
       Tick the teachers below who have applied for NOC to sit an examination — their particulars auto-populate both the Headmaster's Report and the Administrator's Order below.
@@ -426,7 +476,7 @@ return [
 /* ============================= STATE / PERSISTENCE ============================= */
 const STORAGE_KEY = 'tfhs_staff_posts_v1';
 let staffData = [];
-let editingId = null, vacatingId = null, fillingId = null;
+let editingId = null, vacatingId = null, fillingId = null, compactEditingId = null;
 
 function loadData(){
   try{
@@ -444,6 +494,46 @@ function resetToOriginalData(){
   renderAll();
 }
 
+/* ============================= JSON EXPORT & IMPORT ============================= */
+function exportToJson() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(staffData, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", "tfhs_staff_pattern_backup_" + new Date().toISOString().slice(0,10) + ".json");
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
+
+function triggerImport() {
+  document.getElementById('importFileJson').click();
+}
+
+function importFromJson(event) {
+  const fileReader = new FileReader();
+  if (event.target.files && event.target.files[0]) {
+    fileReader.readAsText(event.target.files[0], "UTF-8");
+    fileReader.onload = function(e) {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (Array.isArray(parsed)) {
+          if (confirm('Are you sure you want to overwrite current data with the imported JSON file?')) {
+            staffData = parsed;
+            saveData();
+            renderAll();
+            alert('Staff data imported successfully!');
+          }
+        } else {
+          alert('Invalid JSON structure: Expected an array of staff posts.');
+        }
+      } catch (err) {
+        alert('Error parsing JSON file: ' + err.message);
+      }
+      event.target.value = '';
+    };
+  }
+}
+
 /* ============================= DATE / CALC HELPERS ============================= */
 function parseDMY(str){
   if(!str || str.length < 8) return null;
@@ -456,12 +546,11 @@ function formatDMY(date){
   const d=String(date.getDate()).padStart(2,'0'), m=String(date.getMonth()+1).padStart(2,'0'), y=date.getFullYear();
   return `${d}-${m}-${y}`;
 }
-// FIX: correct DOR = last day of the month in which the employee turns 60 (WB Govt superannuation rule)
 function calculateRetirement(dobStr){
   const dob = parseDMY(dobStr);
   if(!dob) return 'N.A.';
   const retireYear = dob.getFullYear() + 60;
-  const dor = new Date(retireYear, dob.getMonth()+1, 0); // last day of that month
+  const dor = new Date(retireYear, dob.getMonth()+1, 0);
   return formatDMY(dor);
 }
 function calculateExperience(dateStr){
@@ -472,16 +561,15 @@ function calculateExperience(dateStr){
   let years = Math.floor(diffDays/365);
   let months = Math.floor((diffDays%365)/30);
   let days = (diffDays%365)%30;
-  return `${years} years, ${months} months, ${days} days (approx)`;
+  return `${years} yrs, ${months} mos`;
 }
 function desigFull(code){
   return code==='H.M.' ? 'Headmaster' : code==='A.T.' ? 'Assistant Teacher' : (code || 'N.A.');
 }
 
-/* ============================= SUMMARY (AUTO-CALCULATE 52 vs EXISTING) ============================= */
+/* ============================= SUMMARY ============================= */
 function computeSummary(){
-  const groups = {}; // group -> {sanctioned, filled}
-  Object.values(GROUP_META).forEach((g,i)=>{});
+  const groups = {};
   Object.keys(GROUP_META).forEach(g=>groups[g]={sanctioned:0, filled:0});
   staffData.forEach(p=>{
     const g = SECTION_META[p.sec].group;
@@ -506,8 +594,9 @@ function renderSummaryBar(){
       <div class="nums"><span>Sanctioned: ${totalSanctioned}</span><span>Filled: ${totalFilled}</span><span>Vacant: ${totalVacant}</span></div></div>` + html;
   bar.innerHTML = html;
 
-  // pattern tab header info + date
-  document.getElementById('patternDate').textContent = new Date().toLocaleDateString('en-GB').split('/').join('-');
+  const todayStr = new Date().toLocaleDateString('en-GB').split('/').join('-');
+  document.getElementById('patternDate').textContent = todayStr;
+  document.getElementById('compactDate').textContent = todayStr;
   document.getElementById('patternHeaderInfo').innerHTML =
     `<div>Teaching Staff: Normal Section incl HM (Sanctioned: ${groups.NORMAL.sanctioned}, In Position: ${groups.NORMAL.filled}, Vacant: ${groups.NORMAL.sanctioned-groups.NORMAL.filled}) | H.S. Section (Sanctioned: ${groups.HS.sanctioned}, In Position: ${groups.HS.filled}, Vacant: ${groups.HS.sanctioned-groups.HS.filled})</div>
      <div>Librarian (Sanctioned: ${groups.LIB.sanctioned}, In Position: ${groups.LIB.filled}, Vacant: ${groups.LIB.sanctioned-groups.LIB.filled}) | Non-Teaching Clerk (Sanctioned: ${groups.CLERK.sanctioned}, In Position: ${groups.CLERK.filled}, Vacant: ${groups.CLERK.sanctioned-groups.CLERK.filled}) | Peon/Lab Attendant (Sanctioned: ${groups.GRD.sanctioned}, In Position: ${groups.GRD.filled}, Vacant: ${groups.GRD.sanctioned-groups.GRD.filled})</div>`;
@@ -521,7 +610,7 @@ function switchView(viewName, event){
   event.target.classList.add('active');
 }
 
-/* ============================= PATTERN TABLE (52 posts, exact format) ============================= */
+/* ============================= PATTERN TABLE ============================= */
 function renderPatternTable(){
   const tbody = document.getElementById('patternTableBody');
   tbody.innerHTML = '';
@@ -529,7 +618,6 @@ function renderPatternTable(){
   SECTION_ORDER.forEach(secKey=>{
     const posts = staffData.filter(p=>p.sec===secKey).sort((a,b)=>a.sno-b.sno);
     const label = SECTION_META[secKey].label;
-    // insert a group label row when the displayed label changes (skip repeat for HM->none, and for LIB/CLERK/GRD show "NON-TEACHING" once)
     if(label !== lastSection){
       const tr = document.createElement('tr');
       tr.className = 'section-label-row';
@@ -551,7 +639,91 @@ function renderPatternTable(){
   });
 }
 
-/* ============================= MANAGE TABLE (Add / Vacate / Fill) ============================= */
+/* ============================= COMPACT SINGLE-PAGE TABLE WITH FILTERS & MEDIUM ============================= */
+function renderCompactTable(){
+  const tbody = document.getElementById('compactTableBody');
+  const statusFilter = document.getElementById('compactStatusFilter') ? document.getElementById('compactStatusFilter').value : '';
+  const typeFilter = document.getElementById('compactTypeFilter') ? document.getElementById('compactTypeFilter').value : '';
+  
+  const statusLabelText = statusFilter === 'Filled' ? 'Existing / Filled Posts' : (statusFilter === 'Vacant' ? 'Vacant Posts' : 'All Statuses');
+  const typeLabelText = typeFilter === 'Teaching' ? 'Teaching Staff' : (typeFilter === 'Non-Teaching' ? 'Non-Teaching Staff' : 'All Staff Types');
+  const filterLabelEl = document.getElementById('compactFilterLabel');
+  if(filterLabelEl){
+    filterLabelEl.textContent = `[ Filter: ${statusLabelText} | ${typeLabelText} ]`;
+  }
+
+  tbody.innerHTML = '';
+
+  const filtered = staffData.filter(p => {
+    const matchStatus = !statusFilter || p.status === statusFilter;
+    const group = SECTION_META[p.sec].group;
+    const isTeaching = (group === 'NORMAL' || group === 'HS');
+    const matchType = !typeFilter || (typeFilter === 'Teaching' ? isTeaching : !isTeaching);
+    return matchStatus && matchType;
+  });
+
+  filtered.forEach((p, idx)=>{
+    const tr = document.createElement('tr');
+    if(p.status==='Vacant') tr.className='row-vacant';
+    
+    if(p.id === compactEditingId){
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td><input type="text" id="cp_name" value="${p.name}"></td>
+        <td>${SECTION_META[p.sec].label}</td>
+        <td><input type="text" id="cp_subj" value="${p.subj||''}"></td>
+        <td><input type="text" id="cp_mob" value="${p.mobile||''}"></td>
+        <td><input type="text" id="cp_dob" value="${p.dob||''}" placeholder="DD-MM-YYYY"></td>
+        <td><input type="text" id="cp_med" value="${p.medium||'Bengali'}"></td>
+        <td><input type="text" id="cp_rem" value="${p.remarks||''}"></td>
+        <td class="no-print" style="white-space:nowrap;">
+          <button class="btn btn-small btn-fill" onclick="saveCompactEdit(${p.id})">Save</button>
+          <button class="btn btn-small btn-cancel" onclick="cancelCompactEdit()">X</button>
+        </td>`;
+    } else {
+      const nameDisplay = p.status==='Filled' ? `<strong>${p.name}</strong>` : `<span class="vacant-cell">VACANT</span>`;
+      const dorDisplay = p.dob ? calculateRetirement(p.dob) : 'N.A.';
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td>${nameDisplay}</td>
+        <td><small>${SECTION_META[p.sec].label}</small></td>
+        <td>${p.subj||'N.A.'}</td>
+        <td>${p.mobile||'N.A.'}</td>
+        <td>${dorDisplay}</td>
+        <td>${p.medium||'Bengali'}</td>
+        <td style="white-space:normal;">${p.remarks||''}</td>
+        <td class="no-print">
+          <button class="btn btn-small" onclick="startCompactEdit(${p.id})">Edit</button>
+        </td>`;
+    }
+    tbody.appendChild(tr);
+  });
+}
+
+function startCompactEdit(id){
+  compactEditingId = id;
+  renderCompactTable();
+}
+function cancelCompactEdit(){
+  compactEditingId = null;
+  renderCompactTable();
+}
+function saveCompactEdit(id){
+  const p = staffData.find(x=>x.id===id);
+  if(!p) return;
+  p.name = document.getElementById('cp_name').value.trim() || p.name;
+  p.subj = document.getElementById('cp_subj').value.trim();
+  p.mobile = document.getElementById('cp_mob').value.trim();
+  p.dob = document.getElementById('cp_dob').value.trim();
+  p.medium = document.getElementById('cp_med').value.trim();
+  p.remarks = document.getElementById('cp_rem').value.trim();
+  if(p.name !== 'VACANT' && p.status === 'Vacant') p.status = 'Filled';
+  compactEditingId = null;
+  saveData();
+  renderAll();
+}
+
+/* ============================= MANAGE TABLE ============================= */
 function renderManageTable(){
   const tbody = document.getElementById('manageTableBody');
   const statusFilter = document.getElementById('manageStatusFilter').value;
@@ -800,7 +972,7 @@ function resetFilters(){
   onSubGroupChange();
 }
 
-/* ============================= DROPDOWNS (cert / noc) ============================= */
+/* ============================= DROPDOWNS ============================= */
 function initializeDropdowns(){
   const certStaffSelect = document.getElementById('certStaffSelect');
   const nocStaffSelect = document.getElementById('nocStaffSelect');
@@ -859,7 +1031,7 @@ function generateCertificate(){
     <p style="text-align:justify;margin-top:15px;">We wish ${himHer} all success in ${heShe} future endeavors and career progression.</p>`;
 }
 
-/* ============================= NOC (staff details FIRST, then the letter) ============================= */
+/* ============================= NOC ============================= */
 function populateNocFromStaff(){
   const id = document.getElementById('nocStaffSelect').value;
   const wrap = document.getElementById('nocSynopsisWrap');
@@ -874,7 +1046,6 @@ function populateNocFromStaff(){
   document.getElementById('manualMobile').value = p.mobile || '';
   document.getElementById('manualExam').value = 'Competitive Examination / Higher Studies';
 
-  // Staff details synopsis FIRST — with the corrected DOR calculation
   document.getElementById('nocSynName').textContent = `${p.name} (${p.empCode||'N.A.'})`;
   document.getElementById('nocSynDesig').textContent = `${dFull} — ${SECTION_META[p.sec].label}`;
   document.getElementById('nocSynMobile').textContent = p.mobile || 'N.A.';
@@ -892,7 +1063,7 @@ function updateNocDisplay(){
   document.getElementById('displayNocExam').textContent = document.getElementById('manualExam').value || '________________________________________________';
 }
 
-/* ============================= H.O.I. REPORT cum ADMINISTRATOR ORDER ============================= */
+/* ============================= H.O.I. REPORT ============================= */
 function renderHoiCheckboxList(){
   const wrap = document.getElementById('hoiCheckboxList');
   if(!wrap) return;
@@ -962,6 +1133,7 @@ function renderHoiDoc(){
 function renderAll(){
   renderSummaryBar();
   renderPatternTable();
+  renderCompactTable();
   renderManageTable();
   initializeDropdowns();
   filterTable();
