@@ -57,9 +57,13 @@ tr:hover{background:#f1f4f8;}
 .summary-total .nums span{color:#fff !important;}
 .section-label-row td{background:var(--primary-color);color:#fff;font-weight:700;text-align:center;letter-spacing:.5px;padding:6px;}
 .document-box{background:#fff;padding:40px;border:8px solid var(--primary-color);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);max-width:800px;margin:0 auto;position:relative;}
-.doc-header{text-align:center;border-bottom:2px solid var(--primary-color);padding-bottom:15px;margin-bottom:25px;}
-.doc-header h2{margin:0;color:var(--primary-color);font-size:22px;letter-spacing:1px;}
-.doc-header p{margin:4px 0;font-size:12.5px;color:#555;}
+
+/* Beautiful Official School Pad Letterhead Styling */
+.doc-header{text-align:center;border-bottom:3px double var(--primary-color);padding-bottom:14px;margin-bottom:24px;}
+.doc-header h2{margin:0 0 4px;color:var(--primary-color);font-size:25px;letter-spacing:1.5px;font-family:'Georgia',serif;text-transform:uppercase;font-weight:800;}
+.doc-header .sub-title{margin:3px 0;font-size:13px;color:#334155;font-weight:600;letter-spacing:.5px;}
+.doc-header .codes-bar{margin:8px auto 0;font-size:11px;color:#1e293b;background:#f1f5f9;padding:5px 12px;border-radius:20px;display:inline-block;border:1px solid #cbd5e1;font-weight:600;}
+
 .doc-body{font-size:15px;line-height:1.8;color:#333;margin-bottom:30px;}
 .synopsis-box{background:#f8fafc;border:1px solid #cbd5e1;padding:15px;border-radius:6px;margin:15px 0;font-size:13.5px;}
 .synopsis-box table{width:100%;white-space:normal;}
@@ -287,10 +291,10 @@ tr:hover{background:#f1f4f8;}
     </div>
     <div id="printableCert" class="document-box printable-area">
       <div class="doc-header">
-        <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
-        <p>Block: Taldangra | Sub-Division: Khatra | Bankura, West Bengal</p>
-        <p>OSMS Code: 2007277 | DISE Code: 19132104401 | Index: U1-083 | HS Code: 114071</p>
-        <p style="margin-top:12px;font-weight:bold;font-size:16px;text-decoration:underline;">NO OBJECTION CERTIFICATE (NOC) CUM TEACHING EXPERIENCE CERTIFICATE</p>
+        <h2>Taldangra Fulmati High School (H.S.)</h2>
+        <p class="sub-title">Post Office: Taldangra | District: Bankura, West Bengal — 722152</p>
+        <div class="codes-bar">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</div>
+        <p style="margin-top:16px;font-weight:bold;font-size:16px;text-decoration:underline;color:var(--primary-color);">NO OBJECTION CERTIFICATE (NOC) CUM TEACHING EXPERIENCE CERTIFICATE</p>
       </div>
       <div class="doc-body" id="certBodyContent"><p style="text-align:center;color:#775;"><i>Please select a staff member from the dropdown above to generate the certificate and service synopsis.</i></p></div>
       <div class="doc-footer">
@@ -343,17 +347,16 @@ tr:hover{background:#f1f4f8;}
     <div id="printableNoc" class="document-box printable-area" style="margin-top:20px;">
       <div class="doc-header">
         <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
-        <p>Office of the District Inspector of Schools (S.E.), Bankura Sadar Sub-Division</p>
-        <p>Block: Taldangra | Sub-Division: Khatra | Bankura, West Bengal</p>
-        <p>OSMS Code: 2007277 | DISE Code: 19132104401 | Index: U1-083 | HS Code: 114071</p>
-        <p style="margin-top:12px;font-weight:bold;font-size:16px;text-decoration:underline;">NO OBJECTION CERTIFICATE (NOC) FOR EXAMINATION</p>
+        <p class="sub-title">Post Office: Taldangra | District: Bankura, West Bengal — 722152</p>
+        <div class="codes-bar">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</div>
+        <p style="margin-top:16px;font-weight:bold;font-size:16px;text-decoration:underline;color:var(--primary-color);">NO OBJECTION CERTIFICATE (NOC) FOR EXAMINATION</p>
       </div>
       <div class="doc-body">
         <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
           <p style="margin:0;"><strong>Memo No:</strong> TFHS/NOC/2026/___</p>
           <p style="margin:0;"><strong>Date:</strong> <span id="nocCurrentDate"></span></p>
         </div>
-        <p style="text-align:center;font-weight:bold;text-decoration:underline;margin:20px 0;">TO WHOM IT MAY CONCERN</p>
+        <p style="text-align:center;font-weight:bold;text-decoration:underline;margin:25px 0 15px;font-size:16px;">TO WHOM IT MAY CONCERN</p>
         <p style="text-align:justify;margin-top:15px;">
           This is to certify that <strong><span id="displayNocName">________________________</span></strong>, holding Employee Code <strong><span id="displayNocEmpCode">____________</span></strong>, Mobile No. <strong><span id="displayNocMobile">__________</span></strong>, and serving in the post of <strong><span id="displayNocDesignation">____________________</span></strong> in the subject <strong><span id="displayNocSubject">________________</span></strong> under approval reference <strong><span id="displayNocApproval">________________</span></strong> issued by the District Inspector of Schools (S.E.), Bankura Sadar Sub-Division at <strong>Taldangra Fulmati High School (H.S.)</strong> (OSMS Code: 2007277, DISE Code: 19132104401, Index: U1-083, HS Code: 114071), has completed necessary administrative formalities.
         </p>
@@ -405,9 +408,8 @@ tr:hover{background:#f1f4f8;}
     <div class="document-box printable-area" style="max-width:950px;">
       <div class="doc-header">
         <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
-        <p>Office of the District Inspector of Schools (S.E.), Bankura Sadar Sub-Division</p>
-        <p>Block: Taldangra | Sub-Division: Khatra | Bankura, West Bengal</p>
-        <p>OSMS Code: 2007277 | DISE Code: 19132104401 | Index: U1-083 | HS Code: 114071</p>
+        <p class="sub-title">Post Office: Taldangra | District: Bankura, West Bengal — 722152</p>
+        <div class="codes-bar">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</div>
       </div>
       <div id="hoiDocContent"></div>
     </div>
@@ -606,13 +608,10 @@ function calculateTotalExperienceDays(dojStr, prevServiceStr, asOnStr){
   const asOn = asOnStr ? parseDMY(asOnStr) : new Date();
   if(!doj || !asOn) return 0;
   
-  // Current school span in days
   let totalDays = Math.floor((asOn - doj) / (1000 * 60 * 60 * 24));
   if(totalDays < 0) totalDays = 0;
 
-  // Add previous service intervals if present
   if(prevServiceStr && prevServiceStr.trim() !== '' && prevServiceStr.toUpperCase() !== 'NONE'){
-    // Match patterns like [06.10.97-20.04.05] or [06-10-1997-20-04-2005]
     const matches = prevServiceStr.match(/\[(.*?)\]/g);
     if(matches){
       matches.forEach(m => {
