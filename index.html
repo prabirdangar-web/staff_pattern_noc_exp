@@ -1314,7 +1314,7 @@ function renderHoiDoc(){
     <tr>
       <td>${i+1}</td>
       <td class="name-cell">${p.name}</td>
-      <td>${p.appr||'N.A.'} (DI/S)</td>
+      <td>${p.appr||'N.A.'} ;DI/S(S.E.),Bankura</td>
       <td>${p.subj||'N.A.'}</td>
       <td>${p.doa||'N.A.'}</td>
       <td>${currentExp}</td>
@@ -1325,7 +1325,7 @@ function renderHoiDoc(){
 
   const tableHtml = sel.length ? `
     <table class="hoi-table">
-      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval Details</th><th>Subject</th><th>1st DOJ (This School)</th><th>Current School Exp</th><th>Previous School Name & Span</th><th>Total Exp (incl Prev)</th></tr></thead>
+      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval Details</th><th>Subject</th><th>DOJ (This School)</th><th>Current School Exp</th><th>Previous School Name & Span</th><th>Total Exp (incl Prev)</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>` : `<p style="text-align:center;color:#999;padding:14px 0;"><i>Tick one or more teachers above to populate the report and order.</i></p>`;
 
