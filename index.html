@@ -82,7 +82,7 @@ tr:hover{background:#f1f4f8;}
 .help-banner{background:#e0f2fe;border:1px solid #7dd3fc;color:#075985;padding:10px 14px;border-radius:6px;font-size:12.5px;margin-bottom:16px;}
 .hoi-banner{background:var(--primary-color);color:#fff;font-weight:700;text-align:center;padding:8px;border-radius:6px;margin:14px 0 8px;letter-spacing:.5px;font-size:13.5px;}
 .hoi-refline{display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;margin-bottom:8px;}
-.hoi-table{width:100%;border-collapse:collapse;font-size:10.5px;margin:8px 0;}
+.hoi-table{width:100%;border-collapse:collapse;font-size:10px;margin:8px 0;}
 .hoi-table th,.hoi-table td{border:1px solid #94a3b8;padding:4px 5px;text-align:center;}
 .hoi-table th{background:var(--primary-color);color:#fff;font-size:9.5px;}
 .hoi-table td.name-cell{text-align:left;font-weight:700;}
@@ -1308,6 +1308,7 @@ function renderHoiDoc(){
   const rowsHtml = sel.map((p,i)=>{
     const currentExp = calculateExperience(p.doa, asOnDate);
     const hasPrev = p.prevService && p.prevService.trim() !== '' && p.prevService.toUpperCase() !== 'NONE';
+    const prevDetails = hasPrev ? p.prevService : 'None';
     const totalExp = hasPrev ? daysToYearsMonthsDays(calculateTotalExperienceDays(p.doa, p.prevService, asOnDate)) : currentExp;
     return `
     <tr>
@@ -1317,13 +1318,14 @@ function renderHoiDoc(){
       <td>${p.subj||'N.A.'}</td>
       <td>${p.doa||'N.A.'}</td>
       <td>${currentExp}</td>
+      <td style="text-align:left;font-size:10px;">${prevDetails}</td>
       <td>${totalExp}</td>
     </tr>`;
   }).join('');
 
   const tableHtml = sel.length ? `
     <table class="hoi-table">
-      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval Details</th><th>Subject</th><th>1st DOJ (This School)</th><th>Current School Exp</th><th>Total Exp (incl Prev)</th></tr></thead>
+      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval Details</th><th>Subject</th><th>1st DOJ (This School)</th><th>Current School Exp</th><th>Previous School Name & Span</th><th>Total Exp (incl Prev)</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>` : `<p style="text-align:center;color:#999;padding:14px 0;"><i>Tick one or more teachers above to populate the report and order.</i></p>`;
 
