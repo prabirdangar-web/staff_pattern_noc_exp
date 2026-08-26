@@ -292,7 +292,7 @@ tr:hover{background:#f1f4f8;}
     <div id="printableCert" class="document-box printable-area">
       <div class="doc-header">
         <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
-        <p class="sub-title">Post Office: Taldangra | District: Bankura, West Bengal — 722152</p>
+        <p class="sub-title">POST OFFICE: TALDANGRA | DISTRICT: BANKURA, WEST BENGAL — 722152</p>
         <div class="codes-bar">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</div>
       </div>
       <div class="doc-body" id="certBodyContent"><p style="text-align:center;color:#775;"><i>Please select a staff member from the dropdown above to generate the certificate and service synopsis.</i></p></div>
@@ -346,7 +346,7 @@ tr:hover{background:#f1f4f8;}
     <div id="printableNoc" class="document-box printable-area" style="margin-top:20px;">
       <div class="doc-header">
         <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
-        <p class="sub-title">Post Office: Taldangra | District: Bankura, West Bengal — 722152</p>
+        <p class="sub-title">POST OFFICE: TALDANGRA | DISTRICT: BANKURA, WEST BENGAL — 722152</p>
         <div class="codes-bar">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</div>
       </div>
       <div class="doc-body">
@@ -407,7 +407,7 @@ tr:hover{background:#f1f4f8;}
     <div class="document-box printable-area" style="max-width:950px;">
       <div class="doc-header">
         <h2>TALDANGRA FULMATI HIGH SCHOOL (H.S.)</h2>
-        <p class="sub-title">Post Office: Taldangra | District: Bankura, West Bengal — 722152</p>
+        <p class="sub-title">POST OFFICE: TALDANGRA | DISTRICT: BANKURA, WEST BENGAL — 722152</p>
         <div class="codes-bar">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</div>
       </div>
       <div id="hoiDocContent"></div>
@@ -1133,7 +1133,7 @@ function generateCertificate(){
     </div>
     <p style="text-align:center;font-weight:bold;text-decoration:underline;margin:10px 0 5px;font-size:15px;">TO WHOM IT MAY CONCERN</p>
     <p style="text-align:center;font-weight:bold;text-decoration:underline;margin:5px 0 15px;font-size:15px;">NO OBJECTION CERTIFICATE (NOC) CUM TEACHING EXPERIENCE CERTIFICATE</p>
-    <p style="text-align:justify;margin-bottom:10px;">This is to certify that <strong>${honorific} ${p.name}</strong> (Emp Code: <strong>${p.empCode||'N.A.'}</strong>), holding approval qualifications <strong>${qual}</strong>, has been serving in the post of <strong>${dFull}</strong> in the subject <strong>${p.subj||'N.A.'}</strong> (${SECTION_META[p.sec].label}) in <strong>Taldangra Fulmati High School (H.S.)</strong> since <strong>${joinDate}</strong> under approval reference <strong>${p.appr||'N.A.'}</strong> issued by the District Inspector of Schools (S.E.), Bankura Sadar Sub-Division.</p>
+    <p style="text-align:justify;margin-bottom:10px;">This is to certify that <strong>${honorific} ${p.name}</strong> (Emp Code: <strong>${p.empCode||'N.A.'}</strong>), holding approval qualifications <strong>${qual}</strong>, has been serving in the post of <strong>${dFull}</strong> in the subject <strong>${p.subj||'N.A.'}</strong> (${SECTION_META[p.sec].label}) in <strong>Taldangra Fulmati High School (H.S.)</strong> since <strong>${joinDate}</strong> under approval reference <strong>${p.appr||'N.A.'}</strong> issued by the District Inspector of Schools (S.E.), Bankura.</p>
     ${hasPrev ? `<p style="text-align:justify;margin-bottom:10px;">${prevServiceSentence}</p>` : ''}
     <p style="text-align:justify;margin-bottom:10px;">During ${hisHer} tenure in this institution, ${heSheLower} has discharged ${hisHer} duties with utmost sincerity, dedication, and professional competence. ${heShe} bears a good moral character and professional standing.</p>
     <div class="synopsis-box" style="margin:10px 0;padding:10px 15px;">
@@ -1145,7 +1145,7 @@ function generateCertificate(){
         <tr><td><strong>Date of Birth (DOB):</strong></td><td>${p.dob}</td></tr>
         <tr><td><strong>Date of Retirement (DOR):</strong></td><td>${dor}</td></tr>
         <tr><td><strong>1st Date of Joining (DOJ):</strong></td><td>${joinDate}</td></tr>
-        <tr><td><strong>Approval Details:</strong></td><td>${p.appr||'N.A.'} (issued by DI/S (S.E.), Bankura Sadar Sub-Division)</td></tr>
+        <tr><td><strong>Approval Details:</strong></td><td>${p.appr||'N.A.'} (issued by DI/S (S.E.), Bankura)</td></tr>
         <tr><td><strong>Category:</strong></td><td>${p.cat||'N.A.'}</td></tr>
         <tr><td><strong>Previous Service Record:</strong></td><td>${prevServiceSentence || 'None'}</td></tr>
         <tr><td><strong>Total Current School Experience (as on ${asOnDate}):</strong></td><td><strong>${expAsOn}</strong></td></tr>
@@ -1187,7 +1187,7 @@ function populateNocFromStaff(){
   document.getElementById('nocSynPostSubj').textContent = `${dFull} in ${p.subj||'N.A.'}`;
   document.getElementById('nocSynDesig').textContent = `${SECTION_META[p.sec].label}`;
   document.getElementById('nocSynMobile').textContent = p.mobile || 'N.A.';
-  document.getElementById('nocSynApproval').textContent = `${p.appr || 'N.A.'} (DI/S (S.E.), Bankura Sadar Sub-Division)`;
+  document.getElementById('nocSynApproval').textContent = `${p.appr || 'N.A.'} (DI/S (S.E.), Bankura)`;
   document.getElementById('nocSynDob').textContent = p.dob || 'N.A.';
   document.getElementById('nocSynDor').textContent = p.dob ? calculateRetirement(p.dob) : 'N.A.';
   document.getElementById('nocSynExp').innerHTML = `<strong>${exp}</strong>`;
@@ -1308,7 +1308,7 @@ function renderHoiDoc(){
     <tr>
       <td>${i+1}</td>
       <td class="name-cell">${p.name}</td>
-      <td>${p.appr||'N.A.'} (DI/S (S.E.))</td>
+      <td>${p.appr||'N.A.'} (DI/S)</td>
       <td>${p.subj||'N.A.'}</td>
       <td>${p.doa||'N.A.'}</td>
       <td>${currentExp}</td>
@@ -1318,7 +1318,7 @@ function renderHoiDoc(){
 
   const tableHtml = sel.length ? `
     <table class="hoi-table">
-      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval Details</th><th>Subject</th><th>1st DOJ</th><th>Current School Exp</th><th>Total Exp (incl Prev)</th></tr></thead>
+      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval Details</th><th>Subject</th><th>1st DOJ (This School)</th><th>Current School Exp</th><th>Total Exp (incl Prev)</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>` : `<p style="text-align:center;color:#999;padding:14px 0;"><i>Tick one or more teachers above to populate the report and order.</i></p>`;
 
