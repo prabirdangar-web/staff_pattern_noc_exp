@@ -237,7 +237,7 @@ tr:hover{background:#f1f4f8;}
         <label for="subGroupFilter">Filter by Section:</label>
         <select id="subGroupFilter" onchange="onSubGroupChange()">
           <option value="">All Sections</option>
-          <option value="HEADMASTER">HEADMASTER </option>
+          <option value="HEADMASTER / GENERAL">HEADMASTER / GENERAL</option>
           <option value="LANGUAGE GROUP">LANGUAGE GROUP</option>
           <option value="SCIENCE GROUP">SCIENCE GROUP</option>
           <option value="SOCIAL SCIENCE GROUP">SOCIAL SCIENCE GROUP</option>
@@ -316,7 +316,6 @@ tr:hover{background:#f1f4f8;}
       <div class="control-group"><label>Subject Name:</label><input type="text" id="manualSubject" placeholder="e.g. Mathematics" oninput="updateNocDisplay()"></div>
       <div class="control-group"><label>Emp Code:</label><input type="text" id="manualEmpCode" placeholder="e.g. XYZ1234" oninput="updateNocDisplay()"></div>
       <div class="control-group"><label>Mobile No:</label><input type="text" id="manualMobile" placeholder="10-digit mobile" oninput="updateNocDisplay()"></div>
-      <div class="control-group"><label>Application No:</label><input type="text" id="manualAppNo" placeholder="e.g. TFHS/APP/2026/___" oninput="updateNocDisplay()"></div>
       <div class="control-group"><label>Approval No. & Date:</label><input type="text" id="manualApproval" placeholder="e.g. 2252/S; dt.02.08.19" oninput="updateNocDisplay()"></div>
       <div class="control-group"><label>1st DOJ in School:</label><input type="text" id="manualDoj" placeholder="DD-MM-YYYY" oninput="updateNocDisplay()"></div>
       <div class="control-group"><label>Experience As On Date:</label><input type="text" id="nocAsOnDate" placeholder="DD-MM-YYYY" oninput="updateNocDisplay()"></div>
@@ -331,12 +330,12 @@ tr:hover{background:#f1f4f8;}
           <tr><td><strong>Post Name & Subject:</strong></td><td id="nocSynPostSubj"></td></tr>
           <tr><td><strong>Designation:</strong></td><td id="nocSynDesig"></td></tr>
           <tr><td><strong>Mobile No:</strong></td><td id="nocSynMobile"></td></tr>
-          <tr><td><strong>Application No:</strong></td><td id="nocSynAppNo"></td></tr>
           <tr><td><strong>Approval Details:</strong></td><td id="nocSynApproval"></td></tr>
           <tr><td><strong>1st DOJ in School:</strong></td><td id="nocSynDoj"></td></tr>
           <tr><td><strong>Date of Birth:</strong></td><td id="nocSynDob"></td></tr>
           <tr><td><strong>Date of Retirement (DOR):</strong></td><td id="nocSynDor"></td></tr>
           <tr><td><strong>Current School Experience Span:</strong></td><td id="nocSynExp"></td></tr>
+          <tr><td><strong>Total incl prev School Experience:</strong></td><td id="nocSynTotalExp"></td></tr>
           <tr><td><strong>Previous School Experience:</strong></td><td id="nocSynPrev"></td></tr>
         </table>
       </div>
@@ -351,21 +350,22 @@ tr:hover{background:#f1f4f8;}
         <p style="margin-top:12px;font-weight:bold;font-size:16px;text-decoration:underline;">NO OBJECTION CERTIFICATE (NOC) FOR EXAMINATION</p>
       </div>
       <div class="doc-body">
-        <p style="text-align:right;"><strong>Date:</strong> <span id="nocCurrentDate"></span></p>
-        <p style="text-align:right;"><strong>Memo No:</strong> TFHS/NOC/2026/___</p>
-        <p style="text-align:right;"><strong>Application No:</strong> <span id="displayNocAppNo">____________</span></p><br>
-        <p><strong>TO WHOM IT MAY CONCERN</strong></p>
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+          <p style="margin:0;"><strong>Memo No:</strong> TFHS/NOC/2026/___</p>
+          <p style="margin:0;"><strong>Date:</strong> <span id="nocCurrentDate"></span></p>
+        </div>
+        <p style="text-align:center;font-weight:bold;text-decoration:underline;margin:20px 0;">TO WHOM IT MAY CONCERN</p>
         <p style="text-align:justify;margin-top:15px;">
-          This is to certify that <strong><span id="displayNocName">________________________</span></strong>, holding Employee Code <strong><span id="displayNocEmpCode">____________</span></strong>, Mobile No. <strong><span id="displayNocMobile">__________</span></strong>, and serving in the post of <strong><span id="displayNocDesignation">____________________</span></strong> in the subject <strong><span id="displayNocSubject">________________</span></strong> (Approval Details: <strong><span id="displayNocApproval">________________</span></strong>) at <strong>Taldangra Fulmati High School (H.S.)</strong> (OSMS Code: 2007277, DISE Code: 19132104401, Index: U1-083, HS Code: 114071), has completed necessary administrative formalities.
+          This is to certify that <strong><span id="displayNocName">________________________</span></strong>, holding Employee Code <strong><span id="displayNocEmpCode">____________</span></strong>, Mobile No. <strong><span id="displayNocMobile">__________</span></strong>, and serving in the post of <strong><span id="displayNocDesignation">____________________</span></strong> in the subject <strong><span id="displayNocSubject">________________</span></strong> under approval reference <strong><span id="displayNocApproval">________________</span></strong> issued by the District Inspector of Schools (S.E.), Bankura Sadar Sub-Division at <strong>Taldangra Fulmati High School (H.S.)</strong> (OSMS Code: 2007277, DISE Code: 19132104401, Index: U1-083, HS Code: 114071), has completed necessary administrative formalities.
         </p>
         <p style="text-align:justify;margin-top:10px;display:none;" id="displayNocExpPara">
-          <strong><span id="displayNocHeShe">He/She</span></strong> has been serving in this institution since <strong><span id="displayNocDoj">__-__-____</span></strong> (1st DOJ), with a current school service span / total school experience of <strong><span id="displayNocExp">__ Years, __ Months, __ Days</span></strong> as on <strong><span id="displayNocAsOn">__-__-____</span></strong>.
+          <strong><span id="displayNocHeShe">He/She</span></strong> has been serving in this institution since <strong><span id="displayNocDoj">__-__-____</span></strong> (1st DOJ), with a current school service span of <strong><span id="displayNocExp">__ Years, __ Months, __ Days</span></strong> and total experience including previous service of <strong><span id="displayNocTotalExp">__ Years, __ Months, __ Days</span></strong> as on <strong><span id="displayNocAsOn">__-__-____</span></strong>.
         </p>
         <p style="text-align:justify;margin-top:10px;display:none;" id="displayNocPrevPara">
           <span id="displayNocPrevSentence"></span>
         </p>
         <p style="text-align:justify;margin-top:15px;">
-          This school authority has <strong>no objection</strong> if <strong><span id="displayNocHimHerSub">he/she</span></strong> appears in <strong><span id="displayNocExam">________________________________________________</span></strong> or applies for the same, subject to the condition that <strong><span id="displayNocHisHer">his/her</span></strong> school duties and institutional responsibilities are not hampered.
+          This school authority has <strong>no objection</strong> if <strong><span id="displayNocHeSheSub">he/she</span></strong> appears in <strong><span id="displayNocExam">________________________________________________</span></strong> or applies for the same, subject to the condition that <strong><span id="displayNocHisHer">his/her</span></strong> school duties and institutional responsibilities are not hampered.
         </p>
         <p style="text-align:justify;margin-top:15px;" id="displayNocReleaseClause">
           Furthermore, it is clearly stated that if <strong><span id="displayNocHeSheClause">he/she</span></strong> is selected/appointed after the examination, this school has <strong>no objection to releasing <span id="displayNocHimHerClause">him/her</span></strong>, subject to necessary rules and formalities.
@@ -419,7 +419,7 @@ tr:hover{background:#f1f4f8;}
 <script>
 /* ============================= SECTION META ============================= */
 const SECTION_META = {
-  HM:       {label:'HEADMASTER', group:'NORMAL', designation:'H.M.'},
+  HM:       {label:'HEADMASTER / GENERAL', group:'NORMAL', designation:'H.M.'},
   LANGUAGE: {label:'LANGUAGE GROUP',        group:'NORMAL', designation:'A.T.'},
   SCIENCE:  {label:'SCIENCE GROUP',         group:'NORMAL', designation:'A.T.'},
   SOCIAL:   {label:'SOCIAL SCIENCE GROUP',  group:'NORMAL', designation:'A.T.'},
@@ -581,6 +581,7 @@ function calculateRetirement(dobStr){
   const dor = new Date(retireYear, dob.getMonth()+1, 0);
   return formatDMY(dor);
 }
+
 function calculateExperience(dateStr, asOnStr){
   const doj = parseDMY(dateStr);
   const asOn = asOnStr ? parseDMY(asOnStr) : new Date();
@@ -600,6 +601,61 @@ function calculateExperience(dateStr, asOnStr){
   }
   return `${years} Years, ${months} Months, ${days} Days`;
 }
+
+function calculateTotalExperienceDays(dojStr, prevServiceStr, asOnStr){
+  const doj = parseDMY(dojStr);
+  const asOn = asOnStr ? parseDMY(asOnStr) : new Date();
+  if(!doj || !asOn) return 0;
+  
+  // Current school span in days
+  let totalDays = Math.floor((asOn - doj) / (1000 * 60 * 60 * 24));
+  if(totalDays < 0) totalDays = 0;
+
+  // Add previous service intervals if present
+  if(prevServiceStr && prevServiceStr.trim() !== '' && prevServiceStr.toUpperCase() !== 'NONE'){
+    // Match patterns like [06.10.97-20.04.05] or [06-10-1997-20-04-2005]
+    const matches = prevServiceStr.match(/\[(.*?)\]/g);
+    if(matches){
+      matches.forEach(m => {
+        const content = m.replace('[','').replace(']','');
+        const parts = content.split(/[-–—]/);
+        if(parts.length === 2){
+          let startD = parseFlexibleDate(parts[0].trim());
+          let endD = parseFlexibleDate(parts[1].trim());
+          if(startD && endD && endD >= startD){
+            const pDays = Math.floor((endD - startD) / (1000 * 60 * 60 * 24)) + 1;
+            totalDays += pDays;
+          }
+        }
+      });
+    }
+  }
+  return totalDays;
+}
+
+function parseFlexibleDate(str){
+  if(!str) return null;
+  let sep = str.includes('-') ? '-' : (str.includes('.') ? '.' : '/');
+  let p = str.split(sep);
+  if(p.length !== 3) return null;
+  let d = parseInt(p[0], 10);
+  let m = parseInt(p[1], 10);
+  let y = parseInt(p[2], 10);
+  if(y < 100) y += (y < 50 ? 2000 : 1900);
+  return new Date(y, m - 1, d);
+}
+
+function daysToYearsMonthsDays(totalDays){
+  if(isNaN(totalDays) || totalDays <= 0) return '0 Years, 0 Months, 0 Days';
+  let y = Math.floor(totalDays / 365.25);
+  let rem = totalDays - Math.floor(y * 365.25);
+  let m = Math.floor(rem / 30.44);
+  let d = Math.round(rem - (m * 30.44));
+  if(d < 0) d = 0;
+  if(m >= 12){ y++; m -= 12; }
+  return `${y} Years, ${m} Months, ${d} Days`;
+}
+
 function todayDMY(){
   return formatDMY(new Date());
 }
@@ -1057,6 +1113,8 @@ function generateCertificate(){
   if(asOnInput && !asOnInput.value) asOnInput.value = todayDMY();
   const asOnDate = (asOnInput && asOnInput.value) ? asOnInput.value : todayDMY();
   const expAsOn = calculateExperience(joinDate, asOnDate);
+  const totalExpDays = calculateTotalExperienceDays(joinDate, p.prevService, asOnDate);
+  const totalExpFormatted = daysToYearsMonthsDays(totalExpDays);
   const dor = calculateRetirement(p.dob);
   const heShe = p.gender==='M' ? 'his' : 'her', HeShe = p.gender==='M' ? 'he' : 'she';
   const himHer = p.gender==='M' ? 'him' : 'her';
@@ -1065,7 +1123,7 @@ function generateCertificate(){
   const prevServiceSentence = formatPrevServiceSentence(p.prevService, p.gender);
 
   certBody.innerHTML = `
-    <p style="text-align:justify;">This is to certify that <strong>${honorific} ${p.name}</strong> (Emp Code: <strong>${p.empCode||'N.A.'}</strong>), holding approval qualifications <strong>${qual}</strong>, has been serving in the post of <strong>${dFull}</strong> in the subject <strong>${p.subj||'N.A.'}</strong> (${SECTION_META[p.sec].label}) in <strong>Taldangra Fulmati High School (H.S.)</strong> since <strong>${joinDate}</strong> under approval reference <strong>${p.appr||'N.A.'}</strong>.</p>
+    <p style="text-align:justify;">This is to certify that <strong>${honorific} ${p.name}</strong> (Emp Code: <strong>${p.empCode||'N.A.'}</strong>), holding approval qualifications <strong>${qual}</strong>, has been serving in the post of <strong>${dFull}</strong> in the subject <strong>${p.subj||'N.A.'}</strong> (${SECTION_META[p.sec].label}) in <strong>Taldangra Fulmati High School (H.S.)</strong> since <strong>${joinDate}</strong> under approval reference <strong>${p.appr||'N.A.'}</strong> issued by the Office of the District Inspector of Schools (S.E.), Bankura Sadar Sub-Division.</p>
     <p style="text-align:justify;">${prevServiceSentence}</p>
     <p style="text-align:justify;">During ${heShe} tenure in this institution, ${HeShe} has discharged ${heShe} duties with utmost sincerity, dedication, and professional competence. ${HeShe.charAt(0).toUpperCase()+HeShe.slice(1)} bears a good moral character and professional standing.</p>
     <div class="synopsis-box">
@@ -1077,10 +1135,11 @@ function generateCertificate(){
         <tr><td><strong>Date of Birth (DOB):</strong></td><td>${p.dob}</td></tr>
         <tr><td><strong>Date of Retirement (DOR):</strong></td><td>${dor}</td></tr>
         <tr><td><strong>1st Date of Joining (DOJ):</strong></td><td>${joinDate}</td></tr>
-        <tr><td><strong>Approval Details:</strong></td><td>${p.appr||'N.A.'}</td></tr>
+        <tr><td><strong>Approval Details:</strong></td><td>${p.appr||'N.A.'} (issued by DI/S (S.E.), Bankura Sadar Sub-Division)</td></tr>
         <tr><td><strong>Category:</strong></td><td>${p.cat||'N.A.'}</td></tr>
         <tr><td><strong>Previous Service Record:</strong></td><td>${prevServiceSentence || 'None'}</td></tr>
         <tr><td><strong>Total Current School Experience (as on ${asOnDate}):</strong></td><td><strong>${expAsOn}</strong></td></tr>
+        <tr><td><strong>Total incl prev School Experience (as on ${asOnDate}):</strong></td><td><strong>${totalExpFormatted}</strong></td></tr>
       </table>
     </div>
     <p style="text-align:justify;margin-top:15px;font-weight:700;color:#b45309;">NO OBJECTION</p>
@@ -1108,13 +1167,20 @@ function populateNocFromStaff(){
   if(!document.getElementById('nocAsOnDate').value) document.getElementById('nocAsOnDate').value = todayDMY();
   document.getElementById('manualExam').value = 'Competitive Examination / Higher Studies';
 
+  const asOn = document.getElementById('nocAsOnDate').value;
+  const exp = calculateExperience(p.doa, asOn);
+  const totalExpDays = calculateTotalExperienceDays(p.doa, p.prevService, asOn);
+  const totalExpFormatted = daysToYearsMonthsDays(totalExpDays);
+
   document.getElementById('nocSynName').textContent = `${p.name} (${p.empCode||'N.A.'})`;
   document.getElementById('nocSynPostSubj').textContent = `${dFull} in ${p.subj||'N.A.'}`;
   document.getElementById('nocSynDesig').textContent = `${SECTION_META[p.sec].label}`;
   document.getElementById('nocSynMobile').textContent = p.mobile || 'N.A.';
-  document.getElementById('nocSynApproval').textContent = p.appr || 'N.A.';
+  document.getElementById('nocSynApproval').textContent = `${p.appr || 'N.A.'} (DI/S (S.E.), Bankura Sadar Sub-Division)`;
   document.getElementById('nocSynDob').textContent = p.dob || 'N.A.';
   document.getElementById('nocSynDor').textContent = p.dob ? calculateRetirement(p.dob) : 'N.A.';
+  document.getElementById('nocSynExp').innerHTML = `<strong>${exp}</strong>`;
+  document.getElementById('nocSynTotalExp').innerHTML = `<strong>${totalExpFormatted}</strong>`;
   document.getElementById('nocSynPrev').textContent = formatPrevServiceSentence(p.prevService, p.gender) || 'None';
   wrap.style.display = 'block';
 
@@ -1131,7 +1197,6 @@ function updateNocDisplay(){
   const asOnInput = document.getElementById('nocAsOnDate');
   if(asOnInput && !asOnInput.value) asOnInput.value = todayDMY();
   const asOn = asOnInput.value;
-  const appNo = document.getElementById('manualAppNo').value;
   
   const g = genderStaff ? genderStaff.gender : 'M';
   const heShe = g === 'F' ? 'She' : 'He';
@@ -1145,12 +1210,11 @@ function updateNocDisplay(){
   document.getElementById('displayNocEmpCode').textContent = document.getElementById('manualEmpCode').value || '____________';
   document.getElementById('displayNocMobile').textContent = document.getElementById('manualMobile').value || '__________';
   document.getElementById('displayNocExam').textContent = document.getElementById('manualExam').value || '________________________________________________';
-  document.getElementById('displayNocAppNo').textContent = appNo || '____________';
   document.getElementById('displayNocDoj').textContent = doj || '__-__-____';
   document.getElementById('displayNocAsOn').textContent = asOn || '__-__-____';
   
   document.getElementById('displayNocHeShe').textContent = heShe;
-  document.getElementById('displayNocHimHerSub').textContent = himHer;
+  document.getElementById('displayNocHeSheSub').textContent = heShe.toLowerCase();
   document.getElementById('displayNocHisHer').textContent = hisHer;
   document.getElementById('displayNocHeSheClause').textContent = heShe.toLowerCase();
   document.getElementById('displayNocHimHerClause').textContent = himHer;
@@ -1161,10 +1225,17 @@ function updateNocDisplay(){
   
   if(doj){
     const exp = calculateExperience(doj, asOn);
+    const totalExpDays = calculateTotalExperienceDays(doj, genderStaff ? genderStaff.prevService : '', asOn);
+    const totalExpFormatted = daysToYearsMonthsDays(totalExpDays);
+    
     document.getElementById('displayNocExp').innerHTML = `<strong>${exp}</strong>`;
+    document.getElementById('displayNocTotalExp').innerHTML = `<strong>${totalExpFormatted}</strong>`;
     expPara.style.display = '';
+    
     const synExp = document.getElementById('nocSynExp');
     if(synExp) synExp.innerHTML = `<strong>${exp} (as on ${asOn})</strong>`;
+    const synTotalExp = document.getElementById('nocSynTotalExp');
+    if(synTotalExp) synTotalExp.innerHTML = `<strong>${totalExpFormatted} (as on ${asOn})</strong>`;
   } else {
     expPara.style.display = 'none';
   }
@@ -1177,8 +1248,6 @@ function updateNocDisplay(){
     prevPara.style.display = 'none';
   }
 
-  const synAppNo = document.getElementById('nocSynAppNo');
-  if(synAppNo) synAppNo.textContent = appNo || 'N.A.';
   const synDoj = document.getElementById('nocSynDoj');
   if(synDoj) synDoj.textContent = doj || 'N.A.';
 }
@@ -1212,28 +1281,33 @@ function renderHoiDoc(){
   const admnNo = (document.getElementById('hoiAdmnNo')||{}).value || '___________';
   const exam = (document.getElementById('hoiExam')||{}).value || '________________________________';
   const today = new Date().toLocaleDateString('en-GB').split('/').join('-');
+  const asOnDate = todayDMY();
 
-  const rowsHtml = sel.map((p,i)=>`
+  const rowsHtml = sel.map((p,i)=>{
+    const currentExp = calculateExperience(p.doa, asOnDate);
+    const totalExp = daysToYearsMonthsDays(calculateTotalExperienceDays(p.doa, p.prevService, asOnDate));
+    return `
     <tr>
       <td>${i+1}</td>
       <td class="name-cell">${p.name}</td>
-      <td>${p.appr||'N.A.'}</td>
+      <td>${p.appr||'N.A.'} (DI/S (S.E.))</td>
       <td>${p.subj||'N.A.'}</td>
       <td>${p.doa||'N.A.'}</td>
-      <td>${SECTION_META[p.sec].label}</td>
-      <td>${p.mobile||'N.A.'}</td>
-    </tr>`).join('');
+      <td>${currentExp}</td>
+      <td>${totalExp}</td>
+    </tr>`;
+  }).join('');
 
   const tableHtml = sel.length ? `
     <table class="hoi-table">
-      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval No & Date</th><th>Subject</th><th>Date of Appointment</th><th>Section</th><th>Mobile No</th></tr></thead>
+      <thead><tr><th>Sl.No</th><th>Teacher Name</th><th>Approval Details</th><th>Subject</th><th>1st DOJ</th><th>Current School Exp</th><th>Total Exp (incl Prev)</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>` : `<p style="text-align:center;color:#999;padding:14px 0;"><i>Tick one or more teachers above to populate the report and order.</i></p>`;
 
   target.innerHTML = `
     <div class="hoi-banner">REPORT OF THE HEAD OF THE INSTITUTION (H.O.I.)</div>
     <div class="hoi-refline"><span>H.O.I. Report No.: ${reportNo}</span><span>Date: ${today}</span></div>
-    <p style="text-align:justify;">The following Assistant Teachers of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, have submitted applications seeking a <strong>No Objection Certificate (NOC)</strong> to appear in <strong>${exam}</strong>. Their particulars are furnished below for kind consideration:</p>
+    <p style="text-align:justify;">The following Assistant Teachers of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, have submitted applications seeking a <strong>No Objection Certificate (NOC)</strong> to appear in <strong>${exam}</strong>. Their particulars and verified service spans (as on ${asOnDate}) are furnished below for kind consideration:</p>
     ${tableHtml}
     <p style="text-align:justify;">The matter is respectfully placed before the Administrator / Competent Authority for kind consideration and necessary order, along with the applications and supporting documents of the above-named teachers. It is further confirmed that if selected/appointed after the examination, the school has no objection to releasing them, subject to necessary rules and formalities.</p>
     <div class="hoi-sign"><div style="text-align:center;"><div class="signature-line"></div><p style="margin:5px 0 0;font-size:14px;font-weight:700;">Headmaster</p><p style="margin:0;font-size:12px;">Taldangra Fulmati High School (H.S.)</p></div></div>
