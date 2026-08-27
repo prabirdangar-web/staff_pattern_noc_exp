@@ -1305,6 +1305,20 @@ function renderHoiDoc(){
   const today = new Date().toLocaleDateString('en-GB').split('/').join('-');
   const asOnDate = todayDMY();
 
+  const isSingle = sel.length === 1;
+  let pSubj='They', pObj='them', pPoss='their';
+  if(isSingle){
+    const g = (sel[0].gender||'').toUpperCase();
+    if(g==='M'){pSubj='He';pObj='him';pPoss='his';}
+    else if(g==='F'){pSubj='She';pObj='her';pPoss='her';}
+  }
+  const teacherNoun = isSingle ? 'Assistant Teacher' : 'Assistant Teachers';
+  const teacherNounLc = isSingle ? 'teacher' : 'teachers';
+  const hasHave = isSingle ? 'has' : 'have';
+  const appWord = isSingle ? 'application' : 'applications';
+  const spanWord = isSingle ? 'span' : 'spans';
+  const nocWord = isSingle ? 'Certificate' : 'Certificates';
+
   const rowsHtml = sel.map((p,i)=>{
     const currentExp = calculateExperience(p.doa, asOnDate);
     const hasPrev = p.prevService && p.prevService.trim() !== '' && p.prevService.toUpperCase() !== 'NONE';
@@ -1332,17 +1346,17 @@ function renderHoiDoc(){
   target.innerHTML = `
     <div class="hoi-banner">REPORT OF THE HEAD OF THE INSTITUTION (H.O.I.)</div>
     <div class="hoi-refline"><span>H.O.I. Report No.: ${reportNo}</span><span>Date: ${today}</span></div>
-    <p style="text-align:justify;">The following Assistant Teachers of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, have submitted applications seeking a <strong>No Objection Certificate (NOC)</strong> to appear in <strong>${exam}</strong>. Their particulars and verified service spans (as on ${asOnDate}) are furnished below for kind consideration:</p>
+    <p style="text-align:justify;">The following ${teacherNoun} of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, ${hasHave} submitted ${appWord} seeking a <strong>No Objection Certificate (NOC)</strong> to appear in <strong>${exam}</strong>. It is proposed that ${pPoss} particulars and verified service ${spanWord} (as on ${asOnDate}), as furnished below, may kindly be taken into consideration:</p>
     ${tableHtml}
-    <p style="text-align:justify;">The matter is respectfully placed before the Administrator / Competent Authority for kind consideration and necessary order, along with the applications and supporting documents of the above-named teachers. Furthermore, it is clearly stated that if selected or appointed after the examination, this school has no objection to releasing them, subject to necessary rules and formalities.</p>
+    <p style="text-align:justify;">It is respectfully proposed that the matter, along with the ${appWord} and supporting documents of the above-named ${teacherNounLc}, be placed before the Administrator / Competent Authority for kind consideration and necessary order. It is further proposed that, if selected or appointed after the examination, this school may have no objection to releasing ${pObj}, subject to necessary rules and formalities.</p>
     <div class="hoi-sign"><div style="text-align:center;"><div class="signature-line"></div><p style="margin:3px 0 0;font-size:13.5px;font-weight:700;">Headmaster</p><p style="margin:0;font-size:11.5px;">Taldangra Fulmati High School (H.S.)</p></div></div>
 
     <div class="hoi-banner">ADMINISTRATOR ORDER</div>
     <div class="hoi-refline"><span>Administrator Order No.: ${admnNo}</span><span>Date: ${today}</span></div>
-    <p style="text-align:justify;">In pursuance of the Report submitted by the Head of the Institution, the matter relating to the prayer for issuance of NOC in favour of the following teachers of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, has been duly placed, along with their applications and other relevant documents, for kind consideration:</p>
+    <p style="text-align:justify;">In pursuance of the Report submitted by the Head of the Institution, the matter relating to the prayer for issuance of NOC in favour of the following ${teacherNounLc} of <strong>Taldangra Fulmati High School (H.S.)</strong>, P.O.–Taldangra, District – Bankura, has been duly placed, along with ${pPoss} ${appWord} and other relevant documents, for kind consideration:</p>
     ${tableHtml}
-    <p style="text-align:justify;">After careful consideration of the above, permission is hereby accorded to the aforesaid teachers to appear in <strong>${exam}</strong>, for the relevant post(s) of Assistant Teacher as applicable to their subject and section. Furthermore, it is clearly stated that if selected or appointed after the examination, this school has no objection to releasing them, subject to necessary rules and formalities.</p>
-    <p style="text-align:justify;">The Headmaster is hereby requested to issue the necessary No Objection Certificates (NOCs) to the above teachers accordingly, incorporating the release clause upon successful selection or appointment.</p>
+    <p style="text-align:justify;">After careful consideration of the above, permission is hereby accorded to the aforesaid ${teacherNounLc} to appear in <strong>${exam}</strong>, for the relevant post(s) of Assistant Teacher as applicable to ${pPoss} subject and section. Furthermore, it is clearly stated that if selected or appointed after the examination, this school has no objection to releasing ${pObj}, subject to necessary rules and formalities.</p>
+    <p style="text-align:justify;">The Headmaster is hereby requested to issue the necessary No Objection ${nocWord} (NOC${isSingle?'':'s'}) to the above ${teacherNounLc} accordingly, incorporating the release clause upon successful selection or appointment.</p>
     <p style="text-align:justify;"><i>This order is issued on the condition that the normal academic and administrative duties of the institution shall not be hampered in any manner.</i></p>
     <div class="hoi-sign"><div style="text-align:center;"><div class="signature-line"></div><p style="margin:3px 0 0;font-size:13.5px;font-weight:700;">Administrator</p><p style="margin:0;font-size:11.5px;">Taldangra Fulmati High School (H.S.)</p></div></div>
   `;
