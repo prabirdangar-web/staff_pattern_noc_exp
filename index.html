@@ -76,7 +76,14 @@ tr:hover{background:#f1f4f8;}
 .pattern-table{width:100%;border-collapse:collapse;font-size:10px;text-align:center;}
 .pattern-table th,.pattern-table td{border:1px solid #94a3b8;padding:5px 6px;}
 .pattern-table th{background:#1b365d;color:#fff;font-size:9.5px;}
-.pattern-header-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;font-size:11.5px;font-weight:600;background:#e2e8f0;padding:12px;border-radius:6px;}
+.pattern-header-info{margin-bottom:15px;}
+.status-synopsis-table{width:100%;border-collapse:collapse;font-size:10.5px;text-align:center;}
+.status-synopsis-table caption{caption-side:top;text-align:left;font-weight:700;color:var(--primary-color);padding:0 0 6px;font-size:11.5px;}
+.status-synopsis-table th,.status-synopsis-table td{border:1px solid #94a3b8;padding:5px 6px;}
+.status-synopsis-table thead th{background:#1b365d;color:#fff;font-size:9.5px;text-transform:uppercase;letter-spacing:.3px;}
+.status-synopsis-table tbody th{background:#e2e8f0;color:#1b365d;text-align:left;font-weight:700;}
+.status-synopsis-table td.total-col,.status-synopsis-table th.total-col{background:#f1f5f9;font-weight:700;}
+.status-synopsis-table tr.vac-row td{color:var(--vacant-text);font-weight:700;}
 .vacant-cell{font-weight:700;color:var(--vacant-text);letter-spacing:2px;}
 .small-note{font-size:11px;color:#64748b;margin-top:4px;}
 .help-banner{background:#e0f2fe;border:1px solid #7dd3fc;color:#075985;padding:10px 14px;border-radius:6px;font-size:12.5px;margin-bottom:16px;}
@@ -801,9 +808,25 @@ function renderSummaryBar(){
   const todayStr = new Date().toLocaleDateString('en-GB').split('/').join('-');
   document.getElementById('patternDate').textContent = todayStr;
   document.getElementById('compactDate').textContent = todayStr;
-  document.getElementById('patternHeaderInfo').innerHTML =
-    `<div>Teaching Staff: Normal Section incl HM (Sanctioned: ${groups.NORMAL.sanctioned}, In Position: ${groups.NORMAL.filled}, Vacant: ${groups.NORMAL.sanctioned-groups.NORMAL.filled}) | H.S. Section (Sanctioned: ${groups.HS.sanctioned}, In Position: ${groups.HS.filled}, Vacant: ${groups.HS.sanctioned-groups.HS.filled})</div>
-     <div>Librarian (Sanctioned: ${groups.LIB.sanctioned}, In Position: ${groups.LIB.filled}, Vacant: ${groups.LIB.sanctioned-groups.LIB.filled}) | Non-Teaching Clerk (Sanctioned: ${groups.CLERK.sanctioned}, In Position: ${groups.CLERK.filled}, Vacant: ${groups.CLERK.sanctioned-groups.CLERK.filled}) | Peon/Lab Attendant (Sanctioned: ${groups.GRD.sanctioned}, In Position: ${groups.GRD.filled}, Vacant: ${groups.GRD.sanctioned-groups.GRD.filled})</div>`;
+  const gN=groups.NORMAL, gH=groups.HS, gL=groups.LIB, gC=groups.CLERK, gG=groups.GRD;
+  const vN=gN.sanctioned-gN.filled, vH=gH.sanctioned-gH.filled, vL=gL.sanctioned-gL.filled,
+        vC=gC.sanctioned-gC.filled, vG=gG.sanctioned-gG.filled;
+  const tS=gN.sanctioned+gH.sanctioned+gL.sanctioned+gC.sanctioned+gG.sanctioned;
+  const tF=gN.filled+gH.filled+gL.filled+gC.filled+gG.filled;
+  const tV=tS-tF;
+  document.getElementById('patternHeaderInfo').innerHTML = `
+    <table class="status-synopsis-table">
+      <caption>Staff Status Synopsis (Sanctioned / In Position / Vacant)</caption>
+      <thead>
+        <tr><th rowspan="2">Status</th><th colspan="2">Teaching Staff</th><th colspan="3">Non-Teaching Staff</th><th rowspan="2" class="total-col">Total</th></tr>
+        <tr><th>Normal Section</th><th>Higher Secondary Section</th><th>Librarian</th><th>Clerk</th><th>Peon(Gr.-D)/Lab Attendant</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>Sanctioned</th><td>${gN.sanctioned}</td><td>${gH.sanctioned}</td><td>${gL.sanctioned}</td><td>${gC.sanctioned}</td><td>${gG.sanctioned}</td><td class="total-col">${tS}</td></tr>
+        <tr><th>In Position</th><td>${gN.filled}</td><td>${gH.filled}</td><td>${gL.filled}</td><td>${gC.filled}</td><td>${gG.filled}</td><td class="total-col">${tF}</td></tr>
+        <tr class="vac-row"><th>Vacant</th><td>${vN}</td><td>${vH}</td><td>${vL}</td><td>${vC}</td><td>${vG}</td><td class="total-col">${tV}</td></tr>
+      </tbody>
+    </table>`;
 }
 
 /* ============================= TAB SWITCHING ============================= */
