@@ -97,6 +97,8 @@ tr:hover{background:#f1f4f8;}
 .hoi-sign .signature-line{width:180px;}
 @media print{
   @page{size:A4 portrait;margin:6mm 6mm;}
+  html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;}
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
   body *{visibility:hidden;}
   .printable-area,.printable-area *{visibility:visible;}
   .printable-area{position:absolute;left:0;top:0;width:100%;border:none;box-shadow:none;padding:2mm;margin:0;page-break-inside:avoid;}
