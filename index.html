@@ -421,6 +421,25 @@ tr:hover{background:#f1f4f8;}
 
 </div>
 
+<div id="syncStatus" style="position:fixed;bottom:10px;right:10px;background:#1b365d;color:#fff;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;z-index:999;box-shadow:0 2px 6px rgba(0,0,0,.2);" class="no-print">Connecting…</div>
+
+<!-- Firebase (Firestore) - free tier cloud sync so all devices see the same live data -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",
+    authDomain: "tfhs-portal.firebaseapp.com",
+    projectId: "tfhs-portal",
+    storageBucket: "tfhs-portal.firebasestorage.app",
+    messagingSenderId: "316041012204",
+    appId: "1:316041012204:web:c0b52bc796c5ac173716c9"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const staffDocRef = db.collection('tfhs').doc('staffPattern');
+</script>
+
 <script>
 /* ============================= SECTION META ============================= */
 const SECTION_META = {
@@ -506,19 +525,51 @@ return [
 ];
 }
 
-/* ============================= STATE / PERSISTENCE ============================= */
-const STORAGE_KEY = 'tfhs_staff_posts_v1';
+/* ============================= STATE / PERSISTENCE (Firestore cloud sync) ============================= */
+const STORAGE_KEY = 'tfhs_staff_posts_v1'; // kept only as an offline fallback cache
 let staffData = [];
 let editingId = null, vacatingId = null, fillingId = null, compactEditingId = null;
+function setSyncStatus(text, color){
+  const el = document.getElementById('syncStatus');
+  if(el){ el.textContent = text; el.style.background = color || '#1b365d'; }
+}
 
 function loadData(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    staffData = raw ? JSON.parse(raw) : defaultPosts();
-  }catch(e){ staffData = defaultPosts(); }
+  // Real-time listener: fires immediately with current cloud data, then again
+  // automatically whenever ANY device changes it. This is what makes the
+  // link show the same live data everywhere, on any device, any time it's opened.
+  staffDocRef.onSnapshot((docSnap)=>{
+    if(docSnap.exists && Array.isArray(docSnap.data().staffData)){
+      staffData = docSnap.data().staffData;
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(staffData)); }catch(e){}
+      setSyncStatus('☁ Synced', '#0f766e');
+    } else {
+      // First-ever run: no cloud doc yet, so seed it with the default 52-post pattern.
+      staffData = defaultPosts();
+      staffDocRef.set({staffData: staffData, updatedAt: new Date().toISOString()});
+      setSyncStatus('☁ Synced', '#0f766e');
+    }
+    renderAll();
+  }, (err)=>{
+    console.error('Firestore sync error, using local cache:', err);
+    setSyncStatus('⚠ Offline (local only)', '#b45309');
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      staffData = raw ? JSON.parse(raw) : defaultPosts();
+    }catch(e){ staffData = defaultPosts(); }
+    renderAll();
+  });
 }
+
 function saveData(){
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(staffData)); }catch(e){}
+  setSyncStatus('☁ Saving…', '#4b6b94');
+  staffDocRef.set({staffData: staffData, updatedAt: new Date().toISOString()})
+    .then(()=> setSyncStatus('☁ Synced', '#0f766e'))
+    .catch((err)=>{
+      console.error('Firestore save failed:', err);
+      setSyncStatus('⚠ Save failed - check connection', '#b91c1c');
+    });
 }
 function resetToOriginalData(){
   if(!confirm('This will discard all edits (fills/vacancies/corrections) and restore the original 52-post pattern as supplied. Continue?')) return;
@@ -1372,8 +1423,7 @@ function renderAll(){
   filterTable();
   renderHoiCheckboxList();
 }
-loadData();
-renderAll();
+loadData(); // Firestore listener calls renderAll() itself once data arrives
 </script>
 </body>
 </html>
