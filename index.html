@@ -220,9 +220,9 @@ tr:hover{background:#f1f4f8;}
       </div>
       <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
         <button class="btn" onclick="exportToJson()">Export JSON</button>
-        <button class="btn btn-fill" onclick="triggerImport()">Import JSON</button>
+        <button class="btn btn-fill admin-only" onclick="triggerImport()">Import JSON</button>
         <input type="file" id="importFileJson" style="display:none" accept=".json" onchange="importFromJson(event)">
-        <button class="btn btn-cancel" onclick="resetToOriginalData()">Reset Data</button>
+        <button class="btn btn-cancel admin-only" onclick="resetToOriginalData()">Reset Data</button>
       </div>
     </div>
     <div class="table-container">
@@ -426,6 +426,7 @@ tr:hover{background:#f1f4f8;}
 <!-- Firebase (Firestore) - free tier cloud sync so all devices see the same live data -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",
@@ -437,8 +438,28 @@ tr:hover{background:#f1f4f8;}
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+  const auth = firebase.auth();
   const staffDocRef = db.collection('tfhs').doc('staffPattern');
 </script>
+
+<!-- ADMIN LOGIN PANEL (view-only for everyone unless logged in) -->
+<div id="authPanel" class="no-print" style="position:fixed;top:10px;right:10px;z-index:999;background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,.15);font-size:12px;width:210px;">
+  <div id="authLoggedOut">
+    <div style="font-weight:700;margin-bottom:6px;">🔒 View Only Mode</div>
+    <input type="email" id="authEmail" placeholder="Admin email" style="width:100%;margin-bottom:5px;padding:5px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;">
+    <input type="password" id="authPass" placeholder="Password" style="width:100%;margin-bottom:5px;padding:5px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;" onkeydown="if(event.key==='Enter')adminLogin();">
+    <button class="btn btn-small" style="width:100%;" onclick="adminLogin()">Login to Edit</button>
+    <div id="authError" style="color:#b91c1c;font-size:10.5px;margin-top:4px;"></div>
+  </div>
+  <div id="authLoggedIn" style="display:none;">
+    <div style="font-weight:700;margin-bottom:6px;color:#0f766e;">✅ Admin Mode (editing enabled)</div>
+    <button class="btn btn-small btn-cancel" style="width:100%;" onclick="adminLogout()">Logout</button>
+  </div>
+</div>
+<style>
+  .admin-only{display:none;}
+  body.is-admin .admin-only{display:inline-block;}
+</style>
 
 <script>
 /* ============================= SECTION META ============================= */
@@ -529,6 +550,28 @@ return [
 const STORAGE_KEY = 'tfhs_staff_posts_v1'; // kept only as an offline fallback cache
 let staffData = [];
 let editingId = null, vacatingId = null, fillingId = null, compactEditingId = null;
+let isAdmin = false;
+
+/* ---- Admin login/logout (Firebase Authentication) ---- */
+auth.onAuthStateChanged((user)=>{
+  isAdmin = !!user;
+  document.body.classList.toggle('is-admin', isAdmin);
+  document.getElementById('authLoggedOut').style.display = isAdmin ? 'none' : '';
+  document.getElementById('authLoggedIn').style.display = isAdmin ? '' : 'none';
+  if(!isAdmin){ editingId = vacatingId = fillingId = compactEditingId = null; } // exit any open edit forms on logout
+  if(staffData.length) renderAll();
+});
+function adminLogin(){
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPass').value;
+  const errEl = document.getElementById('authError');
+  errEl.textContent = '';
+  auth.signInWithEmailAndPassword(email, pass).catch((err)=>{
+    errEl.textContent = 'Login failed: incorrect email or password.';
+  });
+}
+function adminLogout(){ auth.signOut(); }
+
 function setSyncStatus(text, color){
   const el = document.getElementById('syncStatus');
   if(el){ el.textContent = text; el.style.background = color || '#1b365d'; }
@@ -572,6 +615,7 @@ function saveData(){
     });
 }
 function resetToOriginalData(){
+  if(!isAdmin){ alert('Please log in as admin to reset data.'); return; }
   if(!confirm('This will discard all edits (fills/vacancies/corrections) and restore the original 52-post pattern as supplied. Continue?')) return;
   staffData = defaultPosts();
   saveData();
@@ -590,10 +634,12 @@ function exportToJson() {
 }
 
 function triggerImport() {
+  if(!isAdmin){ alert('Please log in as admin to import data.'); return; }
   document.getElementById('importFileJson').click();
 }
 
 function importFromJson(event) {
+  if(!isAdmin){ alert('Please log in as admin to import data.'); event.target.value=''; return; }
   const fileReader = new FileReader();
   if (event.target.files && event.target.files[0]) {
     fileReader.readAsText(event.target.files[0], "UTF-8");
@@ -851,7 +897,7 @@ function renderCompactTable(){
         <td>${p.medium||'Bengali'}</td>
         <td style="white-space:normal;">${p.remarks||''}</td>
         <td class="no-print">
-          <button class="btn btn-small" onclick="startCompactEdit(${p.id})">Edit</button>
+          ${isAdmin ? `<button class="btn btn-small" onclick="startCompactEdit(${p.id})">Edit</button>` : `<small style="color:#94a3b8;">View only</small>`}
         </td>`;
     }
     tbody.appendChild(tr);
@@ -859,6 +905,7 @@ function renderCompactTable(){
 }
 
 function startCompactEdit(id){
+  if(!isAdmin) return;
   compactEditingId = id;
   renderCompactTable();
 }
@@ -867,6 +914,7 @@ function cancelCompactEdit(){
   renderCompactTable();
 }
 function saveCompactEdit(id){
+  if(!isAdmin) return;
   const p = staffData.find(x=>x.id===id);
   if(!p) return;
   p.name = document.getElementById('cp_name').value.trim() || p.name;
@@ -902,7 +950,9 @@ function renderManageTable(){
     const tr = document.createElement('tr');
     const statusBadge = p.status==='Filled' ? `<span class="badge badge-filled">FILLED</span>` : `<span class="badge badge-vacant">VACANT</span>`;
     let actionBtns = '';
-    if(p.status==='Filled'){
+    if(!isAdmin){
+      actionBtns = `<small style="color:#94a3b8;">View only</small>`;
+    } else if(p.status==='Filled'){
       actionBtns = `<button class="btn btn-small" onclick="startEdit(${p.id})">Edit</button>
                     <button class="btn btn-small btn-warn" onclick="startVacate(${p.id})">Vacate</button>`;
     } else {
@@ -952,8 +1002,9 @@ function buildEditRow(p){
   </td>`;
   return tr;
 }
-function startEdit(id){ vacatingId=null; fillingId=null; editingId=id; renderManageTable(); }
+function startEdit(id){ if(!isAdmin) return; vacatingId=null; fillingId=null; editingId=id; renderManageTable(); }
 function saveEdit(id){
+  if(!isAdmin) return;
   const p = staffData.find(x=>x.id===id);
   p.name = document.getElementById('ef_name').value.trim() || p.name;
   p.desig = document.getElementById('ef_desig').value.trim();
@@ -1001,8 +1052,9 @@ function buildVacateRow(p){
   </td>`;
   return tr;
 }
-function startVacate(id){ editingId=null; fillingId=null; vacatingId=id; renderManageTable(); }
+function startVacate(id){ if(!isAdmin) return; editingId=null; fillingId=null; vacatingId=id; renderManageTable(); }
 function confirmVacate(id){
+  if(!isAdmin) return;
   const p = staffData.find(x=>x.id===id);
   const reason = document.getElementById('vf_reason').value;
   const date = document.getElementById('vf_date').value.trim();
@@ -1051,8 +1103,9 @@ function buildFillRow(p){
   </td>`;
   return tr;
 }
-function startFill(id){ editingId=null; vacatingId=null; fillingId=id; renderManageTable(); }
+function startFill(id){ if(!isAdmin) return; editingId=null; vacatingId=null; fillingId=id; renderManageTable(); }
 function confirmFill(id){
+  if(!isAdmin) return;
   const p = staffData.find(x=>x.id===id);
   const name = document.getElementById('ff_name').value.trim();
   if(!name){ alert('Please enter the staff name.'); return; }
