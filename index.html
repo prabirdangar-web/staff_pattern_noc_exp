@@ -111,6 +111,34 @@ tr:hover{background:#f1f4f8;}
   #printableCompact tr{page-break-inside:avoid;break-inside:avoid;}
 }
 </style>
+<style>
+/* ---- Vacancy statement (D.I. format) ---- */
+#printableVac .vac-page{background:#fff;padding:18px 26px;margin:0 auto 18px;max-width:820px;border:1px solid #cbd5e1;font-family:'Times New Roman',Times,serif;color:#000;font-size:12.5px;line-height:1.45;}
+#printableVac .vac-page.vac-land{max-width:1120px;}
+.vac-tbl{width:100%;border-collapse:collapse;}
+.vac-tbl td,.vac-tbl th{border:1px solid #000;padding:4px 6px;vertical-align:top;color:#000;}
+.vac-tbl th{background:#fff;color:#000;text-transform:none;font-size:11px;position:static;text-align:center;letter-spacing:0;}
+.vac-tbl tr:hover{background:none;}
+.vac-tbl td.n{width:30px;text-align:center;}
+.vac-tbl td.v{font-weight:700;min-width:140px;}
+.vac-tbl td.sub{padding-left:22px;}
+.vac-sign{display:flex;justify-content:space-between;margin-top:34px;font-weight:700;}
+.vac-lh{text-align:center;border-bottom:3px double #000;padding-bottom:6px;margin-bottom:12px;}
+.vac-lh h2{margin:0;font-size:20px;letter-spacing:.5px;}
+.vac-lh p{margin:2px 0;font-size:11.5px;}
+.vac-encl{margin:4px 0 0 0;padding-left:20px;font-size:11.5px;}
+.vac-encl li{margin:1px 0;}
+.vac-card{margin-bottom:10px;}
+@media print{
+  @page vacland{size:A4 landscape;margin:8mm;}
+  #printableVac{page-break-inside:auto !important;break-inside:auto !important;}
+  #printableVac .vac-page{border:none;margin:0;padding:0 3mm;max-width:none;page-break-after:always;break-after:page;}
+  #printableVac .vac-page:last-child{page-break-after:auto;break-after:auto;}
+  #printableVac .vac-page.vac-land{page:vacland;}
+  #printableVac .vac-tbl tr{page-break-inside:avoid;}
+}
+</style>
+
 </head>
 <body>
 <div class="container">
@@ -131,6 +159,7 @@ tr:hover{background:#f1f4f8;}
     <button class="tab-btn" onclick="switchView('certificate',event)">NOC cum Experience Certificate</button>
     <button class="tab-btn" onclick="switchView('noc',event)">NOC for Examination</button>
     <button class="tab-btn" onclick="switchView('hoi',event)">H.O.I. Report / Admin Order</button>
+    <button class="tab-btn" onclick="switchView('vacancy',event)">Vacancy Statement (D.I. Format)</button>
   </div>
 
   <!-- SUMMARY BAR -->
@@ -428,6 +457,43 @@ tr:hover{background:#f1f4f8;}
     </div>
   </div>
 
+
+  <!-- VIEW: VACANCY STATEMENT (D.I.(SE) BANKURA FORMATS) -->
+  <div id="vacancyView" class="view-section">
+    <div class="help-banner no-print">
+      Tick the <strong>vacant posts</strong> to report. Teaching posts print on the D.I. <strong>Teaching Vacancy Statement</strong> (one statement per post); Librarian / Clerk / Gr.-D posts print on the D.I. <strong>Non-Teaching Vacancy Format</strong> (one table). Cause and date are read from the vacancy remark automatically — complete the remaining boxes (roster position, reservation, qualification etc.). Anything left blank prints as an empty line for hand filling.
+    </div>
+    <div class="controls-card no-print">
+      <div class="control-group"><label>Output:</label>
+        <select id="vacMode" onchange="renderVacDoc()">
+          <option value="both">Forwarding letter + Vacancy Statement</option>
+          <option value="stmt">Vacancy Statement only (no letter)</option>
+          <option value="letter">Forwarding letter only</option>
+        </select></div>
+      <div class="control-group"><label>Memo No.:</label><input type="text" id="vacMemo" value="TFHS/VAC/2026/___" oninput="renderVacDoc()"></div>
+      <div class="control-group" style="max-width:170px;"><label>Date (DD-MM-YYYY):</label><input type="text" id="vacDate" oninput="renderVacDoc()"></div>
+      <div class="control-group" style="max-width:150px;"><label>Copies of each statement:</label>
+        <select id="vacCopies" onchange="renderVacDoc()"><option>1</option><option>2</option><option>3</option><option value="4">4 (quadruplicate)</option></select></div>
+      <div><button class="btn" onclick="window.print()">Print / Save PDF</button></div>
+    </div>
+    <div class="controls-card no-print" style="flex-direction:column;align-items:flex-start;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <label style="margin:0;">Select Vacant Posts:</label>
+        <button class="btn btn-small btn-cancel" onclick="vacSelectAll('T')">All Teaching</button>
+        <button class="btn btn-small btn-cancel" onclick="vacSelectAll('N')">All Non-Teaching</button>
+        <button class="btn btn-small btn-cancel" onclick="vacSelectAll('')">Clear</button>
+      </div>
+      <div id="vacPostList" style="width:100%;"></div>
+    </div>
+    <details class="controls-card no-print" style="display:block;">
+      <summary style="cursor:pointer;font-weight:700;color:var(--primary-color);">School particulars used in the format (edit once — remembered on this device)</summary>
+      <div class="inline-form" style="margin-top:10px;"><div class="grid" id="vacSchoolFields"></div></div>
+      <div class="control-group" style="margin-top:10px;"><label>Extra enclosures for the letter (one per line, optional):</label>
+        <textarea id="vacExtraEncl" rows="2" oninput="renderVacDoc()"></textarea></div>
+    </details>
+    <div id="vacForms" class="no-print"></div>
+    <div id="printableVac" class="printable-area"></div>
+  </div>
 </div>
 
 <div id="syncStatus" style="position:fixed;bottom:10px;right:10px;background:#1b365d;color:#fff;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;z-index:999;box-shadow:0 2px 6px rgba(0,0,0,.2);" class="no-print">Connecting…</div>
@@ -1500,8 +1566,267 @@ function renderAll(){
   initializeDropdowns();
   filterTable();
   renderHoiCheckboxList();
+  if(typeof renderVacSelection==='function') renderVacSelection();
 }
 loadData(); // Firestore listener calls renderAll() itself once data arrives
 </script>
+<script>
+/* ============================= VACANCY STATEMENT (D.I.(SE) BANKURA FORMATS) ============================= */
+const VAC_KEY='tfhs_vac_extra_v1', VAC_SCH_KEY='tfhs_vac_school_v1';
+const VAC_SCHOOL_DEFAULT={name:'TALDANGRA FULMATI HIGH SCHOOL (H.S.)',vill:'',po:'Taldangra',block:'Taldangra',pin:'722152',subdiv:'Khatra',mobile:'9933035811',type:'',status:'HS',medium:''};
+const VAC_SCHOOL_LABELS={name:'Name of the School',vill:'Vill',po:'P.O.',block:'Block',pin:'PIN',subdiv:'Sub-Division',mobile:'Mobile No. of the HOI',type:'School Type',status:'School Status',medium:'Medium of Instruction of School'};
+const VAC_SCHOOL_OPT={type:['','Boys','Girls','Co-Ed'],status:['','HS','HIGH','JR. HIGH'],medium:['','Bengali','Santali','English']};
+const VAC_OPT={
+  cause:['','Retirement','Resignation','Death','Creation of New Post','Other'],
+  medium:['','Bengali','Santali','English'],
+  section:['','HS','IX-X','V-VIII'],
+  reserv:['','UR','SC','ST','OBC-A','OBC-B','PH-VI','PH-HI','PH-OH'],
+  gender:['','1. FEMALE','2. MALE/FEMALE','3. MALE'],
+  postName:['Librarian','Clerk',"Gr.'D'",'Lab attendant'],
+  category:['','UR','SC','ST','OBC-A','OBC-B','PH-VI','PH-HI','PH-OH'],
+  roa:['','Yes','No'], court:['','Yes','No']
+};
+const VAC_LABEL={cause:'Cause of Vacancy',outgoing:'Name of Out-going Staff',other:'If cause is "Other" — write it',date:'Date of Occurrence (DD-MM-YYYY)',
+  qual:'Qualification Required',medium:'Medium of the Vacant Post',section:'Section of the Vacant Post',reserv:'Reservation Status',roster:'Position in 100-point Roster',
+  gender:'Gender',remark:'Remarks',postName:'Name of Post',category:'Category (as per 100-point roster)',roa:'ROA Authenticated by BCW Deptt?',
+  sanctionMemo:'Post Sanctioning Memo / Approval copy',court:'Court case pending?'};
+const VAC_FIELDS_T=['cause','outgoing','other','date','qual','medium','section','reserv','roster','gender','remark'];
+const VAC_FIELDS_N=['postName','cause','outgoing','other','date','roster','category','roa','sanctionMemo','court','remark'];
+
+/* Verbatim enclosure lists printed on the D.I. formats */
+const VAC_TEACH_ENCL=[
+ 'A forwarding letter bearing No and Date of the School.',
+ 'Present Staff Pattern including all Teaching and Non Teaching staff and mentioning Vacant Post.',
+ 'Declaration regarding validity of M.C./ Administrator/ Adhoc Committee as he case may be.',
+ 'Photo Copy of Original 100 Point Roster duly signed by the Officials of the D.I/S(SE), Bankura. ( Separate Roster is necessary for Clerk / GR-D Staff)',
+ 'Vacancy Statement duly signed by the H.M/T.I.C/ President/ Secretary as the case may be..',
+ 'Approval Letter of Out Going Non Teaching Staff.',
+ 'No Litigation certificate regarding the Vacant Post.',
+ 'Photo Copy of Resigntion letter in case of resignation vacancy',
+ 'Classwise Enrollment as on the date of submission of vacancy.',
+ 'Subjectwise Enrollment of Lab Based Subject is required for Vacancy of Lab Attendant.',
+ 'Photo copy of M.C Resolution.',
+ 'Post Sanctioning memo( for Additional and newly sanctioned Post).'
+];
+const VAC_NT_ENCL=['Format-I','Approval copy of out going Teaching staff/ post sanctioning order for newly created post.','No litigation Certificate','Staff Pattern',"100-point roster seperately for Gr.'C' & Gr. 'D'"];
+
+let vacExtra={}, vacSchool=Object.assign({},VAC_SCHOOL_DEFAULT), vacSel=new Set();
+try{ vacExtra=JSON.parse(localStorage.getItem(VAC_KEY)||'{}')||{}; }catch(e){}
+try{ Object.assign(vacSchool, JSON.parse(localStorage.getItem(VAC_SCH_KEY)||'{}')); }catch(e){}
+function vacSaveLocal(){ try{ localStorage.setItem(VAC_KEY,JSON.stringify(vacExtra)); localStorage.setItem(VAC_SCH_KEY,JSON.stringify(vacSchool)); }catch(e){} }
+function vesc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function vacIsNT(p){ return p.sec==='LIBRARIAN'||p.sec==='CLERK'||p.sec==='GRD'; }
+function vacKey(p){ return p.id+'|'+(p.remarks||''); }
+function vacNormDate(s){
+  const m=String(s||'').match(/(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{2,4})/); if(!m) return '';
+  let y=m[3]; if(y.length===2) y='20'+y;
+  return m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0')+'-'+y;
+}
+function vacNormMedium(m){ const t=String(m||'').toLowerCase(); return t.indexOf('sant')===0?'Santali':t==='bengali'?'Bengali':t==='english'?'English':''; }
+function vacParse(p){
+  const r=(p.remarks||'').trim(), out={cause:'',outgoing:'',date:'',other:''};
+  if(!r) return out;
+  if(/^new post/i.test(r)){ out.cause='Creation of New Post'; return out; }
+  const m=r.match(/^(Retirement|Resignation|Death|Transfer|Termination|Terminated|Released|Deputation)\b.*?\bof\s+(?:service\s+of\s+)?(.+?)\s+on\s+(\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{2,4})/i);
+  if(m){
+    const k=m[1].toLowerCase();
+    out.outgoing=m[2].trim(); out.date=vacNormDate(m[3]);
+    if(k==='retirement') out.cause='Retirement'; else if(k==='resignation') out.cause='Resignation'; else if(k==='death') out.cause='Death';
+    else { out.cause='Other'; out.other=r; }
+  } else { out.cause='Other'; out.other=r; }
+  return out;
+}
+function vacGet(p){
+  const d=vacParse(p);
+  const base={cause:d.cause,outgoing:d.outgoing,date:d.date,other:d.other,remark:'',qual:'',medium:vacNormMedium(p.medium),section:p.sec==='HS'?'HS':'',
+    reserv:'',roster:'',gender:'',postName:p.sec==='LIBRARIAN'?'Librarian':p.sec==='CLERK'?'Clerk':"Gr.'D'",category:'',roa:'',sanctionMemo:'',court:''};
+  return Object.assign(base, vacExtra[vacKey(p)]||{});
+}
+function vacSet(id,key,val){
+  const p=staffData.find(x=>x.id===id); if(!p) return;
+  const k=vacKey(p); vacExtra[k]=vacExtra[k]||{}; vacExtra[k][key]=val; vacSaveLocal(); renderVacDoc();
+}
+function vacSetSchool(key,val){ vacSchool[key]=val; vacSaveLocal(); renderVacDoc(); }
+function vacPostLabel(p){
+  if(vacIsNT(p)) return vacGet(p).postName;
+  if(p.sec==='HM') return 'Headmaster / Headmistress';
+  return (p.subj||'—')+' ('+SECTION_META[p.sec].label+')';
+}
+
+/* ---------- selection + per-post forms ---------- */
+function vacToggle(id,on){ if(on) vacSel.add(id); else vacSel.delete(id); renderVacForms(); renderVacDoc(); }
+function vacSelectAll(kind){
+  vacSel.clear();
+  if(kind) staffData.filter(p=>p.status==='Vacant' && (kind==='N')===vacIsNT(p)).forEach(p=>vacSel.add(p.id));
+  renderVacSelection();
+}
+function renderVacSchoolFields(){
+  const wrap=document.getElementById('vacSchoolFields'); if(!wrap || wrap.dataset.built) return;
+  wrap.dataset.built='1';
+  wrap.innerHTML=Object.keys(VAC_SCHOOL_LABELS).map(k=>{
+    const o=VAC_SCHOOL_OPT[k], v=vacSchool[k]||'';
+    const ctl=o?`<select onchange="vacSetSchool('${k}',this.value)">${o.map(x=>`<option value="${vesc(x)}" ${x===v?'selected':''}>${x||'-- select --'}</option>`).join('')}</select>`
+      :`<input type="text" value="${vesc(v)}" oninput="vacSetSchool('${k}',this.value)">`;
+    return `<div><label style="display:block;font-size:11px;margin-bottom:3px;">${VAC_SCHOOL_LABELS[k]}</label>${ctl}</div>`;
+  }).join('');
+}
+function renderVacSelection(){
+  const wrap=document.getElementById('vacPostList'); if(!wrap) return;
+  const d=document.getElementById('vacDate'); if(d && !d.value) d.value=todayDMY();
+  renderVacSchoolFields();
+  const vac=staffData.filter(p=>p.status==='Vacant');
+  Array.from(vacSel).forEach(id=>{ if(!vac.find(p=>p.id===id)) vacSel.delete(id); });
+  const mk=arr=>arr.length?arr.map(p=>`<label style="display:flex;align-items:flex-start;gap:6px;font-weight:500;font-size:12px;background:#f1f5f9;padding:6px 10px;border-radius:5px;cursor:pointer;margin:3px 0;">
+      <input type="checkbox" style="width:auto;margin-top:2px;" ${vacSel.has(p.id)?'checked':''} onchange="vacToggle(${p.id},this.checked)">
+      <span><strong>S.No ${p.sno}</strong> · ${vesc(vacPostLabel(p))} <span style="color:#64748b;">— ${vesc(p.remarks||'')}</span></span></label>`).join(''):'<div class="small-note">None vacant.</div>';
+  wrap.innerHTML=`<div style="font-weight:700;font-size:12px;margin:8px 0 2px;color:var(--primary-color);">Teaching posts</div>${mk(vac.filter(p=>!vacIsNT(p)))}
+    <div style="font-weight:700;font-size:12px;margin:10px 0 2px;color:var(--primary-color);">Non-Teaching posts</div>${mk(vac.filter(vacIsNT))}`;
+  renderVacForms(); renderVacDoc();
+}
+function vacField(p,x,key){
+  const o=VAC_OPT[key], v=x[key]||'';
+  const ctl=o?`<select onchange="vacSet(${p.id},'${key}',this.value)">${o.map(z=>`<option value="${vesc(z)}" ${z===v?'selected':''}>${z||'-- select --'}</option>`).join('')}</select>`
+    :`<input type="text" value="${vesc(v)}" oninput="vacSet(${p.id},'${key}',this.value)">`;
+  return `<div><label style="display:block;font-size:11px;margin-bottom:3px;">${VAC_LABEL[key]}</label>${ctl}</div>`;
+}
+function renderVacForms(){
+  const wrap=document.getElementById('vacForms'); if(!wrap) return;
+  const sel=staffData.filter(p=>p.status==='Vacant' && vacSel.has(p.id));
+  wrap.innerHTML=sel.map(p=>{
+    const x=vacGet(p), keys=vacIsNT(p)?VAC_FIELDS_N:VAC_FIELDS_T;
+    return `<div class="inline-form vac-card"><strong>${vacIsNT(p)?'Non-Teaching':'Teaching'} — S.No ${p.sno}: ${vesc(vacPostLabel(p))}</strong>
+      <div class="grid" style="margin-top:8px;">${keys.map(k=>vacField(p,x,k)).join('')}</div></div>`;
+  }).join('');
+}
+
+/* ---------- text helpers ---------- */
+function vacCauseUpper(x){
+  if(x.cause==='Creation of New Post') return 'CREATION OF NEW POST';
+  if(x.cause==='Other') return x.other||'';
+  if(!x.cause) return '';
+  return x.cause.toUpperCase()+(x.outgoing?' OF '+x.outgoing.toUpperCase():'');
+}
+function vacReason(x){
+  if(x.cause==='Creation of New Post') return 'Creation of new post';
+  if(x.cause==='Other') return x.other||'';
+  if(!x.cause) return '';
+  return x.cause+(x.outgoing?' of '+x.outgoing:'');
+}
+function vacBasisSentence(x){
+  const who=x.outgoing||'the out-going incumbent', dt=x.date?(' on '+x.date):'';
+  if(x.cause==='Retirement') return 'retirement of '+who+dt;
+  if(x.cause==='Resignation') return 'resignation of '+who+dt;
+  if(x.cause==='Death') return 'death of '+who+dt;
+  if(x.cause==='Creation of New Post') return 'creation of a new post'+(x.sanctionMemo?(' vide '+x.sanctionMemo):'');
+  return x.other||'';
+}
+function vacEnclosures(cat,list){
+  const xs=list.map(vacGet), t=cat==='T'?'Teaching':'Non-Teaching';
+  const anyOld=xs.some(x=>x.cause!=='Creation of New Post'), anyNew=xs.some(x=>x.cause==='Creation of New Post');
+  const anyRes=xs.some(x=>x.cause==='Resignation'), anyLab=xs.some(x=>x.postName==='Lab attendant');
+  const a=['Present Staff Pattern including all Teaching and Non-Teaching staff, mentioning the vacant post(s).',
+    'Declaration regarding validity of the Managing Committee / Administrator / Ad-hoc Committee, as the case may be.',
+    'Photo copy of the original 100-point roster duly signed by the officials of the D.I. of Schools (SE), Bankura'+(cat==='N'?' (separate roster for Clerk / Gr.-D staff).':'.'),
+    cat==='T'?'Vacancy Statement of Teaching Staff in quadruplicate, duly signed by the H.M/T.I.C and President/Administrator.'
+              :'Vacancy Format (Non-Teaching) duly signed by the H.M/T.I.C and President/Administrator.'];
+  if(anyOld) a.push('Approval letter of the out-going '+t+' staff.');
+  a.push('No-litigation certificate regarding the vacant post(s).');
+  if(anyRes) a.push('Photo copy of the resignation letter.');
+  a.push('Class-wise enrollment as on the date of submission of vacancy.');
+  if(anyLab) a.push('Subject-wise enrollment of lab-based subject (for vacancy of Lab Attendant).');
+  a.push('Photo copy of the Managing Committee resolution.');
+  if(anyNew) a.push('Post sanctioning memo (for additional / newly sanctioned post).');
+  const extra=((document.getElementById('vacExtraEncl')||{}).value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  return a.concat(extra);
+}
+function vacBlank(v){ return v?vesc(v):'&nbsp;'; }
+
+/* ---------- documents ---------- */
+function vacLetter(cat,list){
+  const s=vacSchool, memo=document.getElementById('vacMemo').value, date=document.getElementById('vacDate').value;
+  const many=list.length>1, T=cat==='T';
+  const rows=list.map((p,i)=>{ const x=vacGet(p);
+    return `<tr><td class="n">${i+1}</td><td>${vesc(vacPostLabel(p))}</td><td>${vesc(vacBasisSentence(x).charAt(0).toUpperCase()+vacBasisSentence(x).slice(1))}</td><td>${vesc(x.date||'—')}</td></tr>`; }).join('');
+  const subj=T?'Submission of Vacancy Statement of Teaching Staff'+(many?' for the vacant posts':' for the vacant post')+' of '+list.map(vacPostLabel).join('; ')
+              :'Submission of Vacancy Format (Non-Teaching) for the vacant post'+(many?'s':'')+' of '+list.map(vacPostLabel).join('; ');
+  const encl=vacEnclosures(cat,list);
+  return `<div class="vac-page">
+    <div class="vac-lh"><h2>${vesc(s.name)} <span style="font-size:12px;">(Estd.-1956)</span></h2>
+      <p><b>P.O. &amp; BLOCK – ${vesc((s.po||'').toUpperCase())}, SUB-DIV – ${vesc((s.subdiv||'').toUpperCase())}, DIST – BANKURA, WEST BENGAL, PIN – ${vesc(s.pin)}</b></p>
+      <p>Landline: 03243-265114 | Mobile: ${vesc(s.mobile)} (H.M.) | Email: highschooltaldangrafulmati@gmail.com</p>
+      <p style="font-size:10.5px;">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</p></div>
+    <div style="display:flex;justify-content:space-between;"><span><b>Memo No.:</b> ${vesc(memo)}</span><span><b>Date:</b> ${vesc(date)}</span></div>
+    <p style="margin:10px 0 2px;">To<br>The District Inspector of Schools (SE),<br>Bankura.</p>
+    <p style="margin:10px 0;"><b>Sub:</b> ${vesc(subj)}.</p>
+    <p style="margin:6px 0;">Sir,</p>
+    <p style="text-align:justify;margin:6px 0;">With reference to the above, I beg to inform you that the following post${many?'s':''} of this school ${many?'have':'has'} fallen vacant on the account${many?'s':''} and date${many?'s':''} stated below:</p>
+    <table class="vac-tbl" style="margin:8px 0;"><thead><tr><th>Sl.</th><th>Post</th><th>Basis of Vacancy</th><th>Date of Occurrence</th></tr></thead><tbody>${rows}</tbody></table>
+    <p style="text-align:justify;margin:6px 0;">The ${T?'Vacancy Statement of Teaching Staff (submitted in quadruplicate)':'Vacancy Format for Non-Teaching staff'}, duly signed by the Head of the Institution and the President / Administrator, is submitted herewith for your kind countersignature, along with the documents listed below.</p>
+    <p style="text-align:justify;margin:6px 0;">I, therefore, request you to kindly take necessary steps for filling up the vacant post${many?'s':''} in accordance with the 100-point roster and the rules in force, at an early date.</p>
+    <p style="margin:8px 0 0;">Yours faithfully,</p>
+    <div class="vac-sign" style="margin-top:38px;"><span>Signature of President / Administrator</span><span>Headmaster / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
+    <p style="margin:12px 0 2px;font-weight:700;">Enclosures:</p>
+    <ol class="vac-encl">${encl.map(e=>`<li>${vesc(e)}</li>`).join('')}</ol>
+  </div>`;
+}
+function vacTeachingStmt(p){
+  const x=vacGet(p), s=vacSchool, memo=document.getElementById('vacMemo').value, date=document.getElementById('vacDate').value;
+  const subj=p.sec==='HM'?'Headmaster / Headmistress':(p.subj||'');
+  const R=[['1','NAME OF THE INSTITUTION :-',s.name],['2','ADDRESS',''],['a','a) Vill:-',s.vill],['a','b) P.O:-',s.po],['a','c) Block',s.block],['a','d) PIN CODE:-',s.pin],
+   ['a','e) Sub-Division:-',s.subdiv],['a','f) Mobile No of the HOI:-',s.mobile],['3','School Type:-( Boys/ Girls/Co-Ed)',s.type],['4','School Status:- ( HS/HIGH/JR. HIGH)',s.status],
+   ['5','Medium of Instruction of School:-( Bengali/Santali/English)',s.medium],['6','Subject of Vacant Post:-',subj],['7','Qualification Required:-',x.qual],
+   ['8','Medium of Instruction of the Vacant Post:-( Bengali/Santali/English)',x.medium],['9','Section of the Vacant Post:-( HS/IX-X/V-VIII)',x.section],
+   ['10','RESERVATION STATUS( UR/SC/ST /OBC-A/OBC-B /PH-VI/PH-HI/PH -OH)',x.reserv],['11','POSITION IN 100 POINT ROSTER OF THE SCHOOL:-',x.roster],
+   ['12','GENDER(1.FEMALE 2. MALE/FEMALE 3.MALE):-',x.gender],
+   ['13','CAUSE OF VACANCY( RETIREMENT/RESIGNATION/DEATH/CREATION OF NEW POST) NAME OF THE OUT GOING STAFF IS MANDATORY EXCEPT CREATION OF NEW POST.',vacCauseUpper(x)],
+   ['14','DATE OF OCCURANCE OF VACANCY:-',x.date],['15','REMARKS',x.remark]];
+  const rows=R.map(r=>r[0]==='a'?`<tr><td class="n"></td><td class="sub">${r[1]}</td><td class="v">${vacBlank(r[2])}</td></tr>`
+     :`<tr><td class="n">${r[0]}</td><td>${r[1]}</td><td class="v">${vacBlank(r[2])}</td></tr>`).join('');
+  return `<div class="vac-page" style="font-size:12px;line-height:1.35;">
+    <div style="display:flex;justify-content:space-between;"><span>Memo No. ${vesc(memo)}</span><span>Date.${vesc(date)}</span></div>
+    <div style="text-align:center;font-weight:700;font-size:14px;text-decoration:underline;margin:8px 0 2px;">VACANCY STATEMENT OF TEACHING STAFF(ASSISTANT TEACHER/ HEADMASTER/HEADMISTRESS )</div>
+    <div style="text-align:center;font-weight:700;margin-bottom:8px;">( SUBMITTED IN QUADRUPLICATE)</div>
+    <table class="vac-tbl"><colgroup><col style="width:30px"><col style="width:58%"><col></colgroup><tbody>${rows}</tbody></table>
+    <div class="vac-sign"><span>Signature of H.M/T.I.C</span><span>Signature of President/ Administrator</span></div>
+    <div style="margin-top:12px;font-weight:700;">THE FOLLOWING DOCUMENTS MUST BE ENCLOSED WITH THIS STATEMENT.</div>
+    <ol class="vac-encl" style="font-size:11px;">${VAC_TEACH_ENCL.map(e=>`<li>${vesc(e)}</li>`).join('')}</ol>
+    <div style="text-align:right;margin-top:14px;font-weight:700;">COUNTERSIGNED<br><br>District Inspector of schools(SE), Bankura</div>
+  </div>`;
+}
+function vacNonTeachingStmt(list){
+  const s=vacSchool;
+  const rows=list.map((p,i)=>{ const x=vacGet(p);
+    return `<tr><td class="n">${i+1}</td><td>${vacBlank(x.postName)}</td><td>${vacBlank(x.date)}</td><td>${vacBlank(vacReason(x))}</td><td>${vacBlank(x.roster)}</td><td>${vacBlank(x.category)}</td>
+      <td>${vacBlank(x.roa)}</td><td>${vacBlank(x.sanctionMemo)}</td><td>${vacBlank(x.court)}</td><td>${vacBlank(x.remark)}</td></tr>`; }).join('');
+  return `<div class="vac-page vac-land" style="font-size:12px;">
+    <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin-bottom:8px;">Vacancy Format ( For Non-Teaching)</div>
+    <div style="display:flex;justify-content:space-between;"><span>Name of the School : <b>${vesc(s.name)}</b></span><span>Name of the Block:- <b>${vesc(s.block)}</b></span></div>
+    <div style="margin:3px 0;">Postal address: Vill :- <b>${vesc(s.vill)||'__________'}</b> &nbsp; P.O. :- <b>${vesc(s.po)}</b> &nbsp; Pin :- <b>${vesc(s.pin)}</b></div>
+    <div style="margin-bottom:8px;">Mobile No.of the HOI : <b>${vesc(s.mobile)}</b></div>
+    <table class="vac-tbl"><thead><tr><th>Sl. No.</th><th>Name of post<br>Librarian/Clerk/Gr.’D’/Lab attendant</th><th>Date of occurrence of vacancy</th><th>Reason of occurrence of vacancy</th>
+      <th>Position in 100-point roster of the School</th><th>Category (as per 100-point roster) SC/ST/OBC etc.</th><th>Wheather ROA Authenticated by the BCW Deptt (Yes/No)?</th>
+      <th>Post sanctioning Memo/Approval copy (in case of non-availability of P.S. Memo)</th><th>Whether any court case is pending against the vacant post</th><th>Remarks.</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+    <div style="text-align:center;font-weight:700;margin-top:14px;">COUNTERSIGNED</div>
+    <div class="vac-sign" style="margin-top:30px;"><span>Signature of H.M/T.I.C</span><span>Signature of President/ Administrator</span><span>District Inspector of schools(SE), Bankura</span></div>
+    <div style="margin-top:12px;font-size:11.5px;">Enclo: 1. ${VAC_NT_ENCL[0]}<br>2.${VAC_NT_ENCL[1]}<br>3. ${VAC_NT_ENCL[2]}<br>4. ${VAC_NT_ENCL[3]}<br>5. ${VAC_NT_ENCL[4]}</div>
+  </div>`;
+}
+function renderVacDoc(){
+  const target=document.getElementById('printableVac'); if(!target) return;
+  const mode=document.getElementById('vacMode').value, copies=parseInt(document.getElementById('vacCopies').value,10)||1;
+  const sel=staffData.filter(p=>p.status==='Vacant' && vacSel.has(p.id));
+  const T=sel.filter(p=>!vacIsNT(p)), N=sel.filter(vacIsNT);
+  if(!sel.length){ target.innerHTML='<div class="vac-page" style="text-align:center;color:#64748b;font-family:inherit;"><i>Tick one or more vacant posts above to generate the Vacancy Statement and forwarding letter.</i></div>'; return; }
+  let h='';
+  if(mode!=='stmt'){ if(T.length) h+=vacLetter('T',T); if(N.length) h+=vacLetter('N',N); }
+  if(mode!=='letter'){
+    T.forEach(p=>{ for(let c=0;c<copies;c++) h+=vacTeachingStmt(p); });
+    if(N.length) for(let c=0;c<copies;c++) h+=vacNonTeachingStmt(N);
+  }
+  target.innerHTML=h;
+}
+</script>
+
 </body>
 </html>
