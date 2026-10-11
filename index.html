@@ -120,7 +120,9 @@ tr:hover{background:#f1f4f8;}
 .vac-tbl th{background:#fff;color:#000;text-transform:none;font-size:11px;position:static;text-align:center;letter-spacing:0;}
 .vac-tbl tr:hover{background:none;}
 .vac-tbl td.n{width:30px;text-align:center;}
-.vac-tbl td.v{font-weight:700;min-width:140px;}
+.vac-tbl td.v{font-weight:800;font-size:15px;text-transform:uppercase;min-width:140px;}
+.vac-nt td.v{min-width:0;font-size:13.5px;}
+.vac-fillb{font-weight:800;font-size:15px;text-transform:uppercase;}
 .vac-tbl td.sub{padding-left:22px;}
 .vac-sign{display:flex;justify-content:space-between;margin-top:34px;font-weight:700;}
 .vac-lh{text-align:center;border-bottom:3px double #000;padding-bottom:6px;margin-bottom:12px;}
@@ -471,6 +473,7 @@ tr:hover{background:#f1f4f8;}
           <option value="letter">Forwarding letter only</option>
           <option value="encl">Declaration + No-Litigation Certificate only</option>
         </select></div>
+      <div class="control-group" style="max-width:150px;"><label>School Type:</label><select id="vacTypeTop" onchange="vacSetSchool('type',this.value)"><option value="">-- select --</option><option>Boys</option><option>Girls</option><option>Co-Ed</option></select></div>
       <div class="control-group"><label>Memo No.:</label><input type="text" id="vacMemo" value="TFHS/VAC/2026/___" oninput="renderVacDoc()"></div>
       <div class="control-group" style="max-width:170px;"><label>Date (DD-MM-YYYY):</label><input type="text" id="vacDate" oninput="renderVacDoc()"></div>
       <div class="control-group" style="max-width:150px;"><label>Copies of each statement:</label>
@@ -1577,8 +1580,8 @@ loadData(); // Firestore listener calls renderAll() itself once data arrives
 <script>
 /* ============================= VACANCY STATEMENT (D.I.(SE) BANKURA FORMATS) ============================= */
 const VAC_KEY='tfhs_vac_extra_v1', VAC_SCH_KEY='tfhs_vac_school_v1';
-const VAC_SCHOOL_DEFAULT={name:'TALDANGRA FULMATI HIGH SCHOOL (H.S.)',vill:'',po:'Taldangra',block:'Taldangra',pin:'722152',subdiv:'Khatra',mobile:'9933035811',type:'',status:'HS',medium:'',committeeType:'',committeeHead:'',committeeOrder:'',committeeValid:''};
-const VAC_SCHOOL_LABELS={name:'Name of the School',vill:'Vill',po:'P.O.',block:'Block',pin:'PIN',subdiv:'Sub-Division',mobile:'Mobile No. of the HOI',type:'School Type',status:'School Status',medium:'Medium of Instruction of School',committeeType:'Committee type (for Declaration)',committeeHead:'Name of President / Administrator',committeeOrder:'Committee / Administrator approval Memo No. & Date',committeeValid:'Valid up to (date)'};
+const VAC_SCHOOL_DEFAULT={name:'TALDANGRA FULMATI HIGH SCHOOL (H.S.)',vill:'TALDANGRA',po:'Taldangra',block:'Taldangra',pin:'722152',subdiv:'Khatra',mobile:'9933035811',type:'',status:'HS',medium:'',committeeType:'Administrator',committeeHead:'',committeeOrder:'',committeeValid:''};
+const VAC_SCHOOL_LABELS={name:'Name of the School',vill:'Vill',po:'P.O.',block:'Block',pin:'PIN',subdiv:'Sub-Division',mobile:'Mobile No. of the HOI',type:'School Type',status:'School Status',committeeType:'Committee type (for Declaration)',committeeHead:'Name of President / Administrator',committeeOrder:'Committee / Administrator approval Memo No. & Date',committeeValid:'Valid up to (date)'};
 const VAC_SCHOOL_OPT={type:['','Boys','Girls','Co-Ed'],status:['','HS','HIGH','JR. HIGH'],medium:['','Bengali','Santali','English'],committeeType:['','Managing Committee','Administrator','Ad-hoc Committee']};
 const VAC_OPT={
   cause:['','Retirement','Resignation','Death','Creation of New Post','Other'],
@@ -1617,6 +1620,8 @@ const VAC_NT_ENCL=['Format-I','Approval copy of out going Teaching staff/ post s
 let vacExtra={}, vacSchool=Object.assign({},VAC_SCHOOL_DEFAULT), vacSel=new Set();
 try{ vacExtra=JSON.parse(localStorage.getItem(VAC_KEY)||'{}')||{}; }catch(e){}
 try{ Object.assign(vacSchool, JSON.parse(localStorage.getItem(VAC_SCH_KEY)||'{}')); }catch(e){}
+if(!vacSchool.vill) vacSchool.vill='TALDANGRA';
+if(!vacSchool.committeeType) vacSchool.committeeType='Administrator';
 function vacSaveLocal(){ try{ localStorage.setItem(VAC_KEY,JSON.stringify(vacExtra)); localStorage.setItem(VAC_SCH_KEY,JSON.stringify(vacSchool)); }catch(e){} }
 function vesc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function vacIsNT(p){ return p.sec==='LIBRARIAN'||p.sec==='CLERK'||p.sec==='GRD'; }
@@ -1650,7 +1655,9 @@ function vacSet(id,key,val){
   const p=staffData.find(x=>x.id===id); if(!p) return;
   const k=vacKey(p); vacExtra[k]=vacExtra[k]||{}; vacExtra[k][key]=val; vacSaveLocal(); renderVacDoc();
 }
-function vacSetSchool(key,val){ vacSchool[key]=val; vacSaveLocal(); renderVacDoc(); }
+function vacSetSchool(key,val){ vacSchool[key]=val; vacSaveLocal();
+  if(key==='type'){ ['vacTypeTop','vacSF_type'].forEach(i=>{ const e=document.getElementById(i); if(e) e.value=val; }); }
+  renderVacDoc(); }
 function vacPostLabel(p){
   if(vacIsNT(p)) return vacGet(p).postName;
   if(p.sec==='HM') return 'Headmaster / Headmistress';
@@ -1669,7 +1676,7 @@ function renderVacSchoolFields(){
   wrap.dataset.built='1';
   wrap.innerHTML=Object.keys(VAC_SCHOOL_LABELS).map(k=>{
     const o=VAC_SCHOOL_OPT[k], v=vacSchool[k]||'';
-    const ctl=o?`<select onchange="vacSetSchool('${k}',this.value)">${o.map(x=>`<option value="${vesc(x)}" ${x===v?'selected':''}>${x||'-- select --'}</option>`).join('')}</select>`
+    const ctl=o?`<select id="vacSF_${k}" onchange="vacSetSchool('${k}',this.value)">${o.map(x=>`<option value="${vesc(x)}" ${x===v?'selected':''}>${x||'-- select --'}</option>`).join('')}</select>`
       :`<input type="text" value="${vesc(v)}" oninput="vacSetSchool('${k}',this.value)">`;
     return `<div><label style="display:block;font-size:11px;margin-bottom:3px;">${VAC_SCHOOL_LABELS[k]}</label>${ctl}</div>`;
   }).join('');
@@ -1678,6 +1685,7 @@ function renderVacSelection(){
   const wrap=document.getElementById('vacPostList'); if(!wrap) return;
   const d=document.getElementById('vacDate'); if(d && !d.value) d.value=todayDMY();
   renderVacSchoolFields();
+  const tt=document.getElementById('vacTypeTop'); if(tt) tt.value=vacSchool.type||'';
   const vac=staffData.filter(p=>p.status==='Vacant');
   Array.from(vacSel).forEach(id=>{ if(!vac.find(p=>p.id===id)) vacSel.delete(id); });
   const mk=arr=>arr.length?arr.map(p=>`<label style="display:flex;align-items:flex-start;gap:6px;font-weight:500;font-size:12px;background:#f1f5f9;padding:6px 10px;border-radius:5px;cursor:pointer;margin:3px 0;">
@@ -1779,7 +1787,7 @@ function vacTeachingStmt(p){
   const subj=p.sec==='HM'?'Headmaster / Headmistress':(p.subj||'');
   const R=[['1','NAME OF THE INSTITUTION :-',s.name],['2','ADDRESS',''],['a','a) Vill:-',s.vill],['a','b) P.O:-',s.po],['a','c) Block',s.block],['a','d) PIN CODE:-',s.pin],
    ['a','e) Sub-Division:-',s.subdiv],['a','f) Mobile No of the HOI:-',s.mobile],['3','School Type:-( Boys/ Girls/Co-Ed)',s.type],['4','School Status:- ( HS/HIGH/JR. HIGH)',s.status],
-   ['5','Medium of Instruction of School:-( Bengali/Santali/English)',s.medium],['6','Subject of Vacant Post:-',subj],['7','Qualification Required:-',x.qual],
+   ['5','Medium of Instruction of School:-( Bengali/Santali/English)',x.medium],['6','Subject of Vacant Post:-',subj],['7','Qualification Required:-',x.qual],
    ['8','Medium of Instruction of the Vacant Post:-( Bengali/Santali/English)',x.medium],['9','Section of the Vacant Post:-( HS/IX-X/V-VIII)',x.section],
    ['10','RESERVATION STATUS( UR/SC/ST /OBC-A/OBC-B /PH-VI/PH-HI/PH -OH)',x.reserv],['11','POSITION IN 100 POINT ROSTER OF THE SCHOOL:-',x.roster],
    ['12','GENDER(1.FEMALE 2. MALE/FEMALE 3.MALE):-',x.gender],
@@ -1801,14 +1809,14 @@ function vacTeachingStmt(p){
 function vacNonTeachingStmt(list){
   const s=vacSchool;
   const rows=list.map((p,i)=>{ const x=vacGet(p);
-    return `<tr><td class="n">${i+1}</td><td>${vacBlank(x.postName)}</td><td>${vacBlank(x.date)}</td><td>${vacBlank(vacReason(x))}</td><td>${vacBlank(x.roster)}</td><td>${vacBlank(x.category)}</td>
-      <td>${vacBlank(x.roa)}</td><td>${vacBlank(x.sanctionMemo)}</td><td>${vacBlank(x.court)}</td><td>${vacBlank(x.remark)}</td></tr>`; }).join('');
+    return `<tr><td class="n">${i+1}</td><td class="v">${vacBlank(x.postName)}</td><td class="v">${vacBlank(x.date)}</td><td class="v">${vacBlank(vacReason(x))}</td><td class="v">${vacBlank(x.roster)}</td><td class="v">${vacBlank(x.category)}</td>
+      <td class="v">${vacBlank(x.roa)}</td><td class="v">${vacBlank(x.sanctionMemo)}</td><td class="v">${vacBlank(x.court)}</td><td class="v">${vacBlank(x.remark)}</td></tr>`; }).join('');
   return `<div class="vac-page vac-land" style="font-size:12px;">
     <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin-bottom:8px;">Vacancy Format ( For Non-Teaching)</div>
-    <div style="display:flex;justify-content:space-between;"><span>Name of the School : <b>${vesc(s.name)}</b></span><span>Name of the Block:- <b>${vesc(s.block)}</b></span></div>
-    <div style="margin:3px 0;">Postal address: Vill :- <b>${vesc(s.vill)||'__________'}</b> &nbsp; P.O. :- <b>${vesc(s.po)}</b> &nbsp; Pin :- <b>${vesc(s.pin)}</b></div>
-    <div style="margin-bottom:8px;">Mobile No.of the HOI : <b>${vesc(s.mobile)}</b></div>
-    <table class="vac-tbl"><thead><tr><th>Sl. No.</th><th>Name of post<br>Librarian/Clerk/Gr.’D’/Lab attendant</th><th>Date of occurrence of vacancy</th><th>Reason of occurrence of vacancy</th>
+    <div style="display:flex;justify-content:space-between;"><span>Name of the School : <b class="vac-fillb">${vesc(s.name)}</b></span><span>Name of the Block:- <b class="vac-fillb">${vesc(s.block)}</b></span></div>
+    <div style="margin:3px 0;">Postal address: Vill :- <b class="vac-fillb">${vesc(s.vill)||'__________'}</b> &nbsp; P.O. :- <b class="vac-fillb">${vesc(s.po)}</b> &nbsp; Pin :- <b class="vac-fillb">${vesc(s.pin)}</b></div>
+    <div style="margin-bottom:8px;">Mobile No.of the HOI : <b class="vac-fillb">${vesc(s.mobile)}</b></div>
+    <table class="vac-tbl vac-nt"><thead><tr><th>Sl. No.</th><th>Name of post<br>Librarian/Clerk/Gr.’D’/Lab attendant</th><th>Date of occurrence of vacancy</th><th>Reason of occurrence of vacancy</th>
       <th>Position in 100-point roster of the School</th><th>Category (as per 100-point roster) SC/ST/OBC etc.</th><th>Wheather ROA Authenticated by the BCW Deptt (Yes/No)?</th>
       <th>Post sanctioning Memo/Approval copy (in case of non-availability of P.S. Memo)</th><th>Whether any court case is pending against the vacant post</th><th>Remarks.</th></tr></thead>
       <tbody>${rows}</tbody></table>
@@ -1829,17 +1837,17 @@ function vacPostsPhrase(list){ return list.map(p=>vacPostLabel(p)).join('; '); }
 function vacDeclaration(list){
   const s=vacSchool, memo=document.getElementById('vacMemo').value, date=document.getElementById('vacDate').value;
   const ct=s.committeeType||'Managing Committee / Administrator / Ad-hoc Committee';
-  const head=s.committeeHead?`<b>${vesc(s.committeeHead)}</b>`:'<b>______________________________</b>';
-  const ord=s.committeeOrder?`<b>${vesc(s.committeeOrder)}</b>`:'<b>______________________________</b>';
-  const val=s.committeeValid?`<b>${vesc(s.committeeValid)}</b>`:'<b>______________</b>';
-  const many=list.length>1;
+  const head=s.committeeHead?`<b class="vac-fillb">${vesc(s.committeeHead)}</b>`:'<b>______________________________</b>';
+  const ord=s.committeeOrder?`<b class="vac-fillb">${vesc(s.committeeOrder)}</b>`:'<b>______________________________</b>';
+  const val=s.committeeValid?`<b class="vac-fillb">${vesc(s.committeeValid)}</b>`:'<b>______________</b>';
+  const many=list.length>1, adm=(s.committeeType==='Administrator'), role=adm?'Administrator':(s.committeeType==='Managing Committee'?'President':'President / Administrator');
   return `<div class="vac-page">${vacLH()}
     <div style="display:flex;justify-content:space-between;"><span><b>Memo No.:</b> ${vesc(memo)}</span><span><b>Date:</b> ${vesc(date)}</span></div>
     <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin:18px 0 14px;">DECLARATION REGARDING VALIDITY OF ${vesc(ct.toUpperCase())}</div>
-    <p style="text-align:justify;margin:10px 0;">I, <b>${vesc(vacHead())||'______________________'}</b>, Headmaster / Teacher-in-Charge of <b>${vesc(s.name)}</b>, P.O. ${vesc(s.po)}, Block ${vesc(s.block)}, Sub-Division ${vesc(s.subdiv)}, District Bankura, do hereby declare that the <b>${vesc(ct)}</b> of this school, with ${head} as President / Administrator, has been constituted / appointed / approved vide ${ord}, and is <b>valid up to ${val}</b>.</p>
-    <p style="text-align:justify;margin:10px 0;">I further declare that the said ${vesc(ct)} is legally valid and is in office as on the date of this declaration, and is competent to sign and submit the Vacancy Statement for the vacant post${many?'s':''} of <b>${vesc(vacPostsPhrase(list))}</b> of this school to the District Inspector of Schools (SE), Bankura.</p>
+    <p style="text-align:justify;margin:10px 0;">I, <b class="vac-fillb">${vesc(vacHead())||'______________________'}</b>, Headmaster / Teacher-in-Charge of <b class="vac-fillb">${vesc(s.name)}</b>, P.O. ${vesc(s.po)}, Block ${vesc(s.block)}, Sub-Division ${vesc(s.subdiv)}, District Bankura, do hereby declare that ${adm?`the <b>Administrator</b> of this school, ${head}, has been appointed vide ${ord}, and is <b>valid up to ${val}</b>.`:`the <b>${vesc(ct)}</b> of this school, with ${head} as ${role}, has been constituted / approved vide ${ord}, and is <b>valid up to ${val}</b>.`}</p>
+    <p style="text-align:justify;margin:10px 0;">I further declare that the said ${vesc(ct)} is legally valid and is in office as on the date of this declaration, and is competent to sign and submit the Vacancy Statement for the vacant post${many?'s':''} of <b class="vac-fillb">${vesc(vacPostsPhrase(list))}</b> of this school to the District Inspector of Schools (SE), Bankura.</p>
     <p style="text-align:justify;margin:10px 0;">The above statements are true and correct to the best of my knowledge and belief. If anything is found to be incorrect, I shall be solely responsible for it.</p>
-    <div class="vac-sign" style="margin-top:60px;"><span>Signature of President / Administrator</span><span>Signature of H.M / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
+    <div class="vac-sign" style="margin-top:60px;"><span>Signature of ${role}</span><span>Signature of H.M / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
   </div>`;
 }
 function vacNoLitigation(list){
@@ -1848,7 +1856,7 @@ function vacNoLitigation(list){
   return `<div class="vac-page">${vacLH()}
     <div style="display:flex;justify-content:space-between;"><span><b>Memo No.:</b> ${vesc(memo)}</span><span><b>Date:</b> ${vesc(date)}</span></div>
     <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin:18px 0 14px;">NO LITIGATION CERTIFICATE</div>
-    <p style="text-align:justify;margin:10px 0;">Certified that no case, writ petition, appeal or any other litigation is pending before the Hon’ble Supreme Court, the Hon’ble High Court at Calcutta, the Tribunal or any other Court of law, and no stay or injunction order is in force, regarding the vacant post${many?'s':''} of <b>${vesc(s.name)}</b> mentioned below:</p>
+    <p style="text-align:justify;margin:10px 0;">Certified that no case, writ petition, appeal or any other litigation is pending before the Hon’ble Supreme Court, the Hon’ble High Court at Calcutta, the Tribunal or any other Court of law, and no stay or injunction order is in force, regarding the vacant post${many?'s':''} of <b class="vac-fillb">${vesc(s.name)}</b> mentioned below:</p>
     <table class="vac-tbl" style="margin:10px 0;"><thead><tr><th>Sl.</th><th>Vacant Post</th><th>Cause of Vacancy</th><th>Date of Occurrence</th></tr></thead><tbody>${rows}</tbody></table>
     <p style="text-align:justify;margin:10px 0;">This certificate is issued for submission to the District Inspector of Schools (SE), Bankura along with the Vacancy Statement. The above is true to the best of my knowledge and belief.</p>
     <div class="vac-sign" style="margin-top:60px;"><span>Signature of President / Administrator</span><span>Signature of H.M / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
