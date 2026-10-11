@@ -471,15 +471,17 @@ tr:hover{background:#f1f4f8;}
           <option value="both">Forwarding letter + Vacancy Statement</option>
           <option value="stmt">Vacancy Statement only (no letter)</option>
           <option value="letter">Forwarding letter only</option>
-          <option value="encl">Declaration + No-Litigation Certificate only</option>
+          <option value="encl">Administration Status Certificate + No-Litigation Certificate only</option>
         </select></div>
       <div class="control-group" style="max-width:150px;"><label>School Type:</label><select id="vacTypeTop" onchange="vacSetSchool('type',this.value)"><option value="">-- select --</option><option>Boys</option><option>Girls</option><option>Co-Ed</option></select></div>
+      <div class="control-group" style="max-width:190px;"><label>School Administration:</label><select id="vacCommTop" onchange="vacSetSchool('committeeType',this.value)"><option>Administrator</option><option>Managing Committee</option></select></div>
+      <div class="control-group" style="max-width:170px;"><label>M.C. valid up to (blank = line):</label><input type="text" id="vacValidTop" placeholder="DD-MM-YYYY" oninput="vacSetSchool('committeeValid',this.value)"></div>
       <div class="control-group"><label>Memo No.:</label><input type="text" id="vacMemo" value="TFHS/VAC/2026/___" oninput="renderVacDoc()"></div>
       <div class="control-group" style="max-width:170px;"><label>Date (DD-MM-YYYY):</label><input type="text" id="vacDate" oninput="renderVacDoc()"></div>
       <div class="control-group" style="max-width:150px;"><label>Copies of each statement:</label>
         <select id="vacCopies" onchange="renderVacDoc()"><option>1</option><option>2</option><option>3</option><option value="4">4 (quadruplicate)</option></select></div>
       <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;">
-        <label style="display:flex;gap:6px;align-items:center;margin:0;"><input type="checkbox" id="vacDecl" style="width:auto;" checked onchange="renderVacDoc()"> Declaration on validity of M.C./Administrator</label>
+        <label style="display:flex;gap:6px;align-items:center;margin:0;"><input type="checkbox" id="vacDecl" style="width:auto;" checked onchange="renderVacDoc()"> Certificate regarding status of School Administration</label>
         <label style="display:flex;gap:6px;align-items:center;margin:0;"><input type="checkbox" id="vacNoLit" style="width:auto;" checked onchange="renderVacDoc()"> No-Litigation Certificate</label></div>
       <div><button class="btn" onclick="window.print()">Print / Save PDF</button></div>
     </div>
@@ -1581,8 +1583,8 @@ loadData(); // Firestore listener calls renderAll() itself once data arrives
 /* ============================= VACANCY STATEMENT (D.I.(SE) BANKURA FORMATS) ============================= */
 const VAC_KEY='tfhs_vac_extra_v1', VAC_SCH_KEY='tfhs_vac_school_v1';
 const VAC_SCHOOL_DEFAULT={name:'TALDANGRA FULMATI HIGH SCHOOL (H.S.)',vill:'TALDANGRA',po:'Taldangra',block:'Taldangra',pin:'722152',subdiv:'Khatra',mobile:'9933035811',type:'',status:'HS',medium:'',committeeType:'Administrator',committeeHead:'',committeeOrder:'',committeeValid:''};
-const VAC_SCHOOL_LABELS={name:'Name of the School',vill:'Vill',po:'P.O.',block:'Block',pin:'PIN',subdiv:'Sub-Division',mobile:'Mobile No. of the HOI',type:'School Type',status:'School Status',committeeType:'Committee type (for Declaration)',committeeHead:'Name of President / Administrator',committeeOrder:'Committee / Administrator approval Memo No. & Date',committeeValid:'Valid up to (date)'};
-const VAC_SCHOOL_OPT={type:['','Boys','Girls','Co-Ed'],status:['','HS','HIGH','JR. HIGH'],medium:['','Bengali','Santali','English'],committeeType:['','Managing Committee','Administrator','Ad-hoc Committee']};
+const VAC_SCHOOL_LABELS={name:'Name of the School',vill:'Vill',po:'P.O.',block:'Block',pin:'PIN',subdiv:'Sub-Division',mobile:'Mobile No. of the HOI',type:'School Type',status:'School Status'};
+const VAC_SCHOOL_OPT={type:['','Boys','Girls','Co-Ed'],status:['','HS','HIGH','JR. HIGH'],medium:['','Bengali','Santali','English'],committeeType:['Administrator','Managing Committee']};
 const VAC_OPT={
   cause:['','Retirement','Resignation','Death','Creation of New Post','Other'],
   medium:['','Bengali','Santali','English'],
@@ -1621,7 +1623,7 @@ let vacExtra={}, vacSchool=Object.assign({},VAC_SCHOOL_DEFAULT), vacSel=new Set(
 try{ vacExtra=JSON.parse(localStorage.getItem(VAC_KEY)||'{}')||{}; }catch(e){}
 try{ Object.assign(vacSchool, JSON.parse(localStorage.getItem(VAC_SCH_KEY)||'{}')); }catch(e){}
 if(!vacSchool.vill) vacSchool.vill='TALDANGRA';
-if(!vacSchool.committeeType) vacSchool.committeeType='Administrator';
+if(vacSchool.committeeType!=='Managing Committee') vacSchool.committeeType='Administrator';
 function vacSaveLocal(){ try{ localStorage.setItem(VAC_KEY,JSON.stringify(vacExtra)); localStorage.setItem(VAC_SCH_KEY,JSON.stringify(vacSchool)); }catch(e){} }
 function vesc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function vacIsNT(p){ return p.sec==='LIBRARIAN'||p.sec==='CLERK'||p.sec==='GRD'; }
@@ -1686,6 +1688,8 @@ function renderVacSelection(){
   const d=document.getElementById('vacDate'); if(d && !d.value) d.value=todayDMY();
   renderVacSchoolFields();
   const tt=document.getElementById('vacTypeTop'); if(tt) tt.value=vacSchool.type||'';
+  const ct=document.getElementById('vacCommTop'); if(ct) ct.value=vacSchool.committeeType;
+  const vt=document.getElementById('vacValidTop'); if(vt && document.activeElement!==vt) vt.value=vacSchool.committeeValid||'';
   const vac=staffData.filter(p=>p.status==='Vacant');
   Array.from(vacSel).forEach(id=>{ if(!vac.find(p=>p.id===id)) vacSel.delete(id); });
   const mk=arr=>arr.length?arr.map(p=>`<label style="display:flex;align-items:flex-start;gap:6px;font-weight:500;font-size:12px;background:#f1f5f9;padding:6px 10px;border-radius:5px;cursor:pointer;margin:3px 0;">
@@ -1738,7 +1742,7 @@ function vacEnclosures(cat,list){
   const anyOld=xs.some(x=>x.cause!=='Creation of New Post'), anyNew=xs.some(x=>x.cause==='Creation of New Post');
   const anyRes=xs.some(x=>x.cause==='Resignation'), anyLab=xs.some(x=>x.postName==='Lab attendant');
   const a=['Present Staff Pattern including all Teaching and Non-Teaching staff, mentioning the vacant post(s).',
-    'Declaration regarding validity of the Managing Committee / Administrator / Ad-hoc Committee, as the case may be.',
+    'Certificate regarding status of school administration ('+(vacSchool.committeeType==='Managing Committee'?'Managing Committee':'Administrator')+').',
     'Photo copy of the original 100-point roster duly signed by the officials of the D.I. of Schools (SE), Bankura'+(cat==='N'?' (separate roster for Clerk / Gr.-D staff).':'.'),
     cat==='T'?'Vacancy Statement of Teaching Staff in quadruplicate, duly signed by the H.M/T.I.C and President/Administrator.'
               :'Vacancy Format (Non-Teaching) duly signed by the H.M/T.I.C and President/Administrator.'];
@@ -1836,18 +1840,17 @@ function vacLH(){
 function vacPostsPhrase(list){ return list.map(p=>vacPostLabel(p)).join('; '); }
 function vacDeclaration(list){
   const s=vacSchool, memo=document.getElementById('vacMemo').value, date=document.getElementById('vacDate').value;
-  const ct=s.committeeType||'Managing Committee / Administrator / Ad-hoc Committee';
-  const head=s.committeeHead?`<b class="vac-fillb">${vesc(s.committeeHead)}</b>`:'<b>______________________________</b>';
-  const ord=s.committeeOrder?`<b class="vac-fillb">${vesc(s.committeeOrder)}</b>`:'<b>______________________________</b>';
-  const val=s.committeeValid?`<b class="vac-fillb">${vesc(s.committeeValid)}</b>`:'<b>______________</b>';
-  const many=list.length>1, adm=(s.committeeType==='Administrator'), role=adm?'Administrator':(s.committeeType==='Managing Committee'?'President':'President / Administrator');
+  const adm=(s.committeeType!=='Managing Committee'), role=adm?'Administrator':'President';
+  const val=s.committeeValid?`<b>${vesc(s.committeeValid)}</b>`:'<b>________________</b>';
+  const nm=`<b>${vesc(s.name)}</b>`;
+  const pts=adm?['The Administrator has been functioning now in this school.','There is no court case or any type of litigation against the appointment of the Administrator.']
+    :[`The Managing Committee of ${nm} has been functioning now.`,`The term of the valid Managing Committee is up to ${val}.`,`There is no Court case, legal bar, or any type of litigation regarding the reconstitution of the Managing Committee of ${nm}.`];
   return `<div class="vac-page">${vacLH()}
     <div style="display:flex;justify-content:space-between;"><span><b>Memo No.:</b> ${vesc(memo)}</span><span><b>Date:</b> ${vesc(date)}</span></div>
-    <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin:18px 0 14px;">DECLARATION REGARDING VALIDITY OF ${vesc(ct.toUpperCase())}</div>
-    <p style="text-align:justify;margin:10px 0;">I, <b class="vac-fillb">${vesc(vacHead())||'______________________'}</b>, Headmaster / Teacher-in-Charge of <b class="vac-fillb">${vesc(s.name)}</b>, P.O. ${vesc(s.po)}, Block ${vesc(s.block)}, Sub-Division ${vesc(s.subdiv)}, District Bankura, do hereby declare that ${adm?`the <b>Administrator</b> of this school, ${head}, has been appointed vide ${ord}, and is <b>valid up to ${val}</b>.`:`the <b>${vesc(ct)}</b> of this school, with ${head} as ${role}, has been constituted / approved vide ${ord}, and is <b>valid up to ${val}</b>.`}</p>
-    <p style="text-align:justify;margin:10px 0;">I further declare that the said ${vesc(ct)} is legally valid and is in office as on the date of this declaration, and is competent to sign and submit the Vacancy Statement for the vacant post${many?'s':''} of <b class="vac-fillb">${vesc(vacPostsPhrase(list))}</b> of this school to the District Inspector of Schools (SE), Bankura.</p>
-    <p style="text-align:justify;margin:10px 0;">The above statements are true and correct to the best of my knowledge and belief. If anything is found to be incorrect, I shall be solely responsible for it.</p>
-    <div class="vac-sign" style="margin-top:60px;"><span>Signature of ${role}</span><span>Signature of H.M / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
+    <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin:18px 0 14px;">Certificate Regarding Status of School Administration</div>
+    <p style="margin:10px 0;"><b>Certified that:</b></p>
+    <ol style="margin:6px 0 0 0;padding-left:24px;line-height:1.8;">${pts.map(t=>`<li style="text-align:justify;margin-bottom:6px;">${adm?vesc(t):t}</li>`).join('')}</ol>
+    <div class="vac-sign" style="margin-top:70px;"><span>Signature of ${role}</span><span>Signature of H.M / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
   </div>`;
 }
 function vacNoLitigation(list){
