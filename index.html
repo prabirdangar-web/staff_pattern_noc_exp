@@ -469,11 +469,15 @@ tr:hover{background:#f1f4f8;}
           <option value="both">Forwarding letter + Vacancy Statement</option>
           <option value="stmt">Vacancy Statement only (no letter)</option>
           <option value="letter">Forwarding letter only</option>
+          <option value="encl">Declaration + No-Litigation Certificate only</option>
         </select></div>
       <div class="control-group"><label>Memo No.:</label><input type="text" id="vacMemo" value="TFHS/VAC/2026/___" oninput="renderVacDoc()"></div>
       <div class="control-group" style="max-width:170px;"><label>Date (DD-MM-YYYY):</label><input type="text" id="vacDate" oninput="renderVacDoc()"></div>
       <div class="control-group" style="max-width:150px;"><label>Copies of each statement:</label>
         <select id="vacCopies" onchange="renderVacDoc()"><option>1</option><option>2</option><option>3</option><option value="4">4 (quadruplicate)</option></select></div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;">
+        <label style="display:flex;gap:6px;align-items:center;margin:0;"><input type="checkbox" id="vacDecl" style="width:auto;" checked onchange="renderVacDoc()"> Declaration on validity of M.C./Administrator</label>
+        <label style="display:flex;gap:6px;align-items:center;margin:0;"><input type="checkbox" id="vacNoLit" style="width:auto;" checked onchange="renderVacDoc()"> No-Litigation Certificate</label></div>
       <div><button class="btn" onclick="window.print()">Print / Save PDF</button></div>
     </div>
     <div class="controls-card no-print" style="flex-direction:column;align-items:flex-start;">
@@ -1573,9 +1577,9 @@ loadData(); // Firestore listener calls renderAll() itself once data arrives
 <script>
 /* ============================= VACANCY STATEMENT (D.I.(SE) BANKURA FORMATS) ============================= */
 const VAC_KEY='tfhs_vac_extra_v1', VAC_SCH_KEY='tfhs_vac_school_v1';
-const VAC_SCHOOL_DEFAULT={name:'TALDANGRA FULMATI HIGH SCHOOL (H.S.)',vill:'',po:'Taldangra',block:'Taldangra',pin:'722152',subdiv:'Khatra',mobile:'9933035811',type:'',status:'HS',medium:''};
-const VAC_SCHOOL_LABELS={name:'Name of the School',vill:'Vill',po:'P.O.',block:'Block',pin:'PIN',subdiv:'Sub-Division',mobile:'Mobile No. of the HOI',type:'School Type',status:'School Status',medium:'Medium of Instruction of School'};
-const VAC_SCHOOL_OPT={type:['','Boys','Girls','Co-Ed'],status:['','HS','HIGH','JR. HIGH'],medium:['','Bengali','Santali','English']};
+const VAC_SCHOOL_DEFAULT={name:'TALDANGRA FULMATI HIGH SCHOOL (H.S.)',vill:'',po:'Taldangra',block:'Taldangra',pin:'722152',subdiv:'Khatra',mobile:'9933035811',type:'',status:'HS',medium:'',committeeType:'',committeeHead:'',committeeOrder:'',committeeValid:''};
+const VAC_SCHOOL_LABELS={name:'Name of the School',vill:'Vill',po:'P.O.',block:'Block',pin:'PIN',subdiv:'Sub-Division',mobile:'Mobile No. of the HOI',type:'School Type',status:'School Status',medium:'Medium of Instruction of School',committeeType:'Committee type (for Declaration)',committeeHead:'Name of President / Administrator',committeeOrder:'Committee / Administrator approval Memo No. & Date',committeeValid:'Valid up to (date)'};
+const VAC_SCHOOL_OPT={type:['','Boys','Girls','Co-Ed'],status:['','HS','HIGH','JR. HIGH'],medium:['','Bengali','Santali','English'],committeeType:['','Managing Committee','Administrator','Ad-hoc Committee']};
 const VAC_OPT={
   cause:['','Retirement','Resignation','Death','Creation of New Post','Other'],
   medium:['','Bengali','Santali','English'],
@@ -1694,7 +1698,8 @@ function renderVacForms(){
   const sel=staffData.filter(p=>p.status==='Vacant' && vacSel.has(p.id));
   wrap.innerHTML=sel.map(p=>{
     const x=vacGet(p), keys=vacIsNT(p)?VAC_FIELDS_N:VAC_FIELDS_T;
-    return `<div class="inline-form vac-card"><strong>${vacIsNT(p)?'Non-Teaching':'Teaching'} — S.No ${p.sno}: ${vesc(vacPostLabel(p))}</strong>
+    const warn=/court|judgment|hon.ble/i.test(p.remarks||'')?'<div class="small-note" style="color:#b91c1c;font-weight:600;">⚠ The remark mentions a court order/judgment — confirm no case is pending before signing the No-Litigation Certificate for this post.</div>':'';
+    return `<div class="inline-form vac-card"><strong>${vacIsNT(p)?'Non-Teaching':'Teaching'} — S.No ${p.sno}: ${vesc(vacPostLabel(p))}</strong>${warn}
       <div class="grid" style="margin-top:8px;">${keys.map(k=>vacField(p,x,k)).join('')}</div></div>`;
   }).join('');
 }
@@ -1812,6 +1817,43 @@ function vacNonTeachingStmt(list){
     <div style="margin-top:12px;font-size:11.5px;">Enclo: 1. ${VAC_NT_ENCL[0]}<br>2.${VAC_NT_ENCL[1]}<br>3. ${VAC_NT_ENCL[2]}<br>4. ${VAC_NT_ENCL[3]}<br>5. ${VAC_NT_ENCL[4]}</div>
   </div>`;
 }
+function vacHead(){ const h=staffData.find(x=>x.sec==='HM'&&x.status==='Filled'); return h?h.name:''; }
+function vacLH(){
+  const s=vacSchool;
+  return `<div class="vac-lh"><h2>${vesc(s.name)} <span style="font-size:12px;">(Estd.-1956)</span></h2>
+      <p><b>P.O. &amp; BLOCK – ${vesc((s.po||'').toUpperCase())}, SUB-DIV – ${vesc((s.subdiv||'').toUpperCase())}, DIST – BANKURA, WEST BENGAL, PIN – ${vesc(s.pin)}</b></p>
+      <p>Landline: 03243-265114 | Mobile: ${vesc(s.mobile)} (H.M.) | Email: highschooltaldangrafulmati@gmail.com</p>
+      <p style="font-size:10.5px;">OSMS: 2007277 | DISE: 19132104401 | Index: U1-083 | HS Code: 114071</p></div>`;
+}
+function vacPostsPhrase(list){ return list.map(p=>vacPostLabel(p)).join('; '); }
+function vacDeclaration(list){
+  const s=vacSchool, memo=document.getElementById('vacMemo').value, date=document.getElementById('vacDate').value;
+  const ct=s.committeeType||'Managing Committee / Administrator / Ad-hoc Committee';
+  const head=s.committeeHead?`<b>${vesc(s.committeeHead)}</b>`:'<b>______________________________</b>';
+  const ord=s.committeeOrder?`<b>${vesc(s.committeeOrder)}</b>`:'<b>______________________________</b>';
+  const val=s.committeeValid?`<b>${vesc(s.committeeValid)}</b>`:'<b>______________</b>';
+  const many=list.length>1;
+  return `<div class="vac-page">${vacLH()}
+    <div style="display:flex;justify-content:space-between;"><span><b>Memo No.:</b> ${vesc(memo)}</span><span><b>Date:</b> ${vesc(date)}</span></div>
+    <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin:18px 0 14px;">DECLARATION REGARDING VALIDITY OF ${vesc(ct.toUpperCase())}</div>
+    <p style="text-align:justify;margin:10px 0;">I, <b>${vesc(vacHead())||'______________________'}</b>, Headmaster / Teacher-in-Charge of <b>${vesc(s.name)}</b>, P.O. ${vesc(s.po)}, Block ${vesc(s.block)}, Sub-Division ${vesc(s.subdiv)}, District Bankura, do hereby declare that the <b>${vesc(ct)}</b> of this school, with ${head} as President / Administrator, has been constituted / appointed / approved vide ${ord}, and is <b>valid up to ${val}</b>.</p>
+    <p style="text-align:justify;margin:10px 0;">I further declare that the said ${vesc(ct)} is legally valid and is in office as on the date of this declaration, and is competent to sign and submit the Vacancy Statement for the vacant post${many?'s':''} of <b>${vesc(vacPostsPhrase(list))}</b> of this school to the District Inspector of Schools (SE), Bankura.</p>
+    <p style="text-align:justify;margin:10px 0;">The above statements are true and correct to the best of my knowledge and belief. If anything is found to be incorrect, I shall be solely responsible for it.</p>
+    <div class="vac-sign" style="margin-top:60px;"><span>Signature of President / Administrator</span><span>Signature of H.M / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
+  </div>`;
+}
+function vacNoLitigation(list){
+  const s=vacSchool, memo=document.getElementById('vacMemo').value, date=document.getElementById('vacDate').value, many=list.length>1;
+  const rows=list.map((p,i)=>{ const x=vacGet(p); return `<tr><td class="n">${i+1}</td><td>${vesc(vacPostLabel(p))}</td><td>${vesc(vacReason(x)||'—')}</td><td>${vesc(x.date||'—')}</td></tr>`; }).join('');
+  return `<div class="vac-page">${vacLH()}
+    <div style="display:flex;justify-content:space-between;"><span><b>Memo No.:</b> ${vesc(memo)}</span><span><b>Date:</b> ${vesc(date)}</span></div>
+    <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin:18px 0 14px;">NO LITIGATION CERTIFICATE</div>
+    <p style="text-align:justify;margin:10px 0;">Certified that no case, writ petition, appeal or any other litigation is pending before the Hon’ble Supreme Court, the Hon’ble High Court at Calcutta, the Tribunal or any other Court of law, and no stay or injunction order is in force, regarding the vacant post${many?'s':''} of <b>${vesc(s.name)}</b> mentioned below:</p>
+    <table class="vac-tbl" style="margin:10px 0;"><thead><tr><th>Sl.</th><th>Vacant Post</th><th>Cause of Vacancy</th><th>Date of Occurrence</th></tr></thead><tbody>${rows}</tbody></table>
+    <p style="text-align:justify;margin:10px 0;">This certificate is issued for submission to the District Inspector of Schools (SE), Bankura along with the Vacancy Statement. The above is true to the best of my knowledge and belief.</p>
+    <div class="vac-sign" style="margin-top:60px;"><span>Signature of President / Administrator</span><span>Signature of H.M / T.I.C.<br><span style="font-weight:400;">${vesc(s.name)}</span></span></div>
+  </div>`;
+}
 function renderVacDoc(){
   const target=document.getElementById('printableVac'); if(!target) return;
   const mode=document.getElementById('vacMode').value, copies=parseInt(document.getElementById('vacCopies').value,10)||1;
@@ -1819,10 +1861,14 @@ function renderVacDoc(){
   const T=sel.filter(p=>!vacIsNT(p)), N=sel.filter(vacIsNT);
   if(!sel.length){ target.innerHTML='<div class="vac-page" style="text-align:center;color:#64748b;font-family:inherit;"><i>Tick one or more vacant posts above to generate the Vacancy Statement and forwarding letter.</i></div>'; return; }
   let h='';
-  if(mode!=='stmt'){ if(T.length) h+=vacLetter('T',T); if(N.length) h+=vacLetter('N',N); }
-  if(mode!=='letter'){
+  if(mode==='both'||mode==='letter'){ if(T.length) h+=vacLetter('T',T); if(N.length) h+=vacLetter('N',N); }
+  if(mode==='both'||mode==='stmt'){
     T.forEach(p=>{ for(let c=0;c<copies;c++) h+=vacTeachingStmt(p); });
     if(N.length) for(let c=0;c<copies;c++) h+=vacNonTeachingStmt(N);
+  }
+  if(mode==='both'||mode==='encl'){
+    if(document.getElementById('vacDecl').checked) h+=vacDeclaration(sel);
+    if(document.getElementById('vacNoLit').checked) h+=vacNoLitigation(sel);
   }
   target.innerHTML=h;
 }
