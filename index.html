@@ -1588,7 +1588,7 @@ const VAC_SCHOOL_OPT={type:['','Boys','Girls','Co-Ed'],status:['','HS','HIGH','J
 const VAC_OPT={
   cause:['','Retirement','Resignation','Death','Creation of New Post','Other'],
   medium:['','Bengali','Santali','English'],
-  section:['','HS','IX-X','V-VIII'],
+  section:['','HS','IX-X','V-VIII','NORMAL SECTION','Other (Manual)'],
   reserv:['','UR','SC','ST','OBC-A','OBC-B','PH-VI','PH-HI','PH-OH'],
   gender:['','1. FEMALE','2. MALE/FEMALE','3. MALE'],
   postName:['Librarian','Clerk',"Gr.'D'",'Lab attendant'],
@@ -1596,7 +1596,7 @@ const VAC_OPT={
   roa:['','Yes','No'], court:['','Yes','No']
 };
 const VAC_LABEL={cause:'Cause of Vacancy',outgoing:'Name of Out-going Staff',other:'If cause is "Other" — write it',eventDate:'Date of Retirement / Resignation / Death / Termination',sanctionDate:'Post Sanctioning Memo Date (new post)',date:'Date of Occurrence of Vacancy (auto: next day / memo date)',
-  qual:'Qualification Required',medium:'Medium of the Vacant Post',section:'Section of the Vacant Post',reserv:'Reservation Status',roster:'Position in 100-point Roster',
+  qual:'Qualification Required',medium:'Medium of the Vacant Post',section:'Section of the Vacant Post',sectionManual:'Section (type manually)',reserv:'Reservation Status',roster:'Position in 100-point Roster',
   gender:'Gender',remark:'Remarks',postName:'Name of Post',category:'Category (as per 100-point roster)',roa:'ROA Authenticated by BCW Deptt?',
   sanctionMemo:'Post Sanctioning Memo No. / Approval copy',court:'Court case pending?'};
 const VAC_FIELDS_T=['cause','outgoing','other','eventDate','sanctionMemo','sanctionDate','date','qual','medium','section','reserv','roster','gender','remark'];
@@ -1649,7 +1649,7 @@ function vacParse(p){
 }
 function vacGet(p){
   const d=vacParse(p);
-  const base={cause:d.cause,outgoing:d.outgoing,eventDate:d.date,date:'',sanctionDate:'',other:d.other,remark:'',qual:'',medium:vacNormMedium(p.medium),section:p.sec==='HS'?'HS':'',
+  const base={sectionManual:'',cause:d.cause,outgoing:d.outgoing,eventDate:d.date,date:'',sanctionDate:'',other:d.other,remark:'',qual:'',medium:vacNormMedium(p.medium),section:p.sec==='HS'?'HS':'',
     reserv:'',roster:'',gender:'',postName:p.sec==='LIBRARIAN'?'Librarian':p.sec==='CLERK'?'Clerk':"Gr.'D'",category:'',roa:'',sanctionMemo:'',court:''};
   const m=Object.assign(base, vacExtra[vacKey(p)]||{});
   if(!m.date) m.date = m.cause==='Creation of New Post' ? (vacNormDate(m.sanctionDate)||m.sanctionDate||'') : vacNextDay(m.eventDate);
@@ -1709,8 +1709,20 @@ function renderVacSelection(){
     <div style="font-weight:700;font-size:12px;margin:10px 0 2px;color:var(--primary-color);">Non-Teaching posts</div>${mk(vac.filter(vacIsNT))}`;
   renderVacForms(); renderVacDoc();
 }
+function vacSectionText(x){ return x.section==='Other (Manual)' ? (x.sectionManual||'') : (x.section||''); }
+function vacSectionChange(id,sel){
+  vacSet(id,'section',sel.value);
+  const m=document.getElementById('vf_'+id+'_sectionManual');
+  if(m){ m.style.display = sel.value==='Other (Manual)' ? 'block' : 'none'; if(sel.value==='Other (Manual)') m.focus(); }
+}
 function vacField(p,x,key){
   const o=VAC_OPT[key], v=x[key]||'';
+  if(key==='section'){
+    const isO = v==='Other (Manual)';
+    return `<div><label style="display:block;font-size:11px;margin-bottom:3px;">${VAC_LABEL.section}</label>
+      <select id="vf_${p.id}_section" onchange="vacSectionChange(${p.id},this)">${o.map(z=>`<option value="${vesc(z)}" ${z===v?'selected':''}>${z||'-- select --'}</option>`).join('')}</select>
+      <input type="text" id="vf_${p.id}_sectionManual" placeholder="Type section manually" value="${vesc(x.sectionManual||'')}" oninput="vacSet(${p.id},'sectionManual',this.value)" style="display:${isO?'block':'none'};margin-top:6px;"></div>`;
+  }
   const ctl=o?`<select id="vf_${p.id}_${key}" onchange="vacSet(${p.id},'${key}',this.value)">${o.map(z=>`<option value="${vesc(z)}" ${z===v?'selected':''}>${z||'-- select --'}</option>`).join('')}</select>`
     :`<input type="text" id="vf_${p.id}_${key}" value="${vesc(v)}" oninput="vacSet(${p.id},'${key}',this.value)">`;
   return `<div><label style="display:block;font-size:11px;margin-bottom:3px;">${VAC_LABEL[key]}</label>${ctl}</div>`;
@@ -1798,7 +1810,7 @@ function vacTeachingStmt(p){
   const R=[['1','NAME OF THE INSTITUTION :-',s.name],['2','ADDRESS',''],['a','a) Vill:-',s.vill],['a','b) P.O:-',s.po],['a','c) Block',s.block],['a','d) PIN CODE:-',s.pin],
    ['a','e) Sub-Division:-',s.subdiv],['a','f) Mobile No of the HOI:-',s.mobile],['3','School Type:-( Boys/ Girls/Co-Ed)',s.type],['4','School Status:- ( HS/HIGH/JR. HIGH)',s.status],
    ['5','Medium of Instruction of School:-( Bengali/Santali/English)',x.medium],['6','Subject of Vacant Post:-',subj],['7','Qualification Required:-',x.qual],
-   ['8','Medium of Instruction of the Vacant Post:-( Bengali/Santali/English)',x.medium],['9','Section of the Vacant Post:-( HS/IX-X/V-VIII)',x.section],
+   ['8','Medium of Instruction of the Vacant Post:-( Bengali/Santali/English)',x.medium],['9','Section of the Vacant Post:-( HS/IX-X/V-VIII)',vacSectionText(x)],
    ['10','RESERVATION STATUS( UR/SC/ST /OBC-A/OBC-B /PH-VI/PH-HI/PH -OH)',x.reserv],['11','POSITION IN 100 POINT ROSTER OF THE SCHOOL:-',x.roster],
    ['12','GENDER(1.FEMALE 2. MALE/FEMALE 3.MALE):-',x.gender],
    ['13','CAUSE OF VACANCY( RETIREMENT/RESIGNATION/DEATH/CREATION OF NEW POST) NAME OF THE OUT GOING STAFF IS MANDATORY EXCEPT CREATION OF NEW POST.',vacCauseUpper(x)],
