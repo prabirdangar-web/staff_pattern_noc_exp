@@ -1595,12 +1595,12 @@ const VAC_OPT={
   category:['','UR','SC','ST','OBC-A','OBC-B','PH-VI','PH-HI','PH-OH'],
   roa:['','Yes','No'], court:['','Yes','No']
 };
-const VAC_LABEL={cause:'Cause of Vacancy',outgoing:'Name of Out-going Staff',other:'If cause is "Other" — write it',date:'Date of Occurrence (DD-MM-YYYY)',
+const VAC_LABEL={cause:'Cause of Vacancy',outgoing:'Name of Out-going Staff',other:'If cause is "Other" — write it',eventDate:'Date of Retirement / Resignation / Death / Termination',sanctionDate:'Post Sanctioning Memo Date (new post)',date:'Date of Occurrence of Vacancy (auto: next day / memo date)',
   qual:'Qualification Required',medium:'Medium of the Vacant Post',section:'Section of the Vacant Post',reserv:'Reservation Status',roster:'Position in 100-point Roster',
   gender:'Gender',remark:'Remarks',postName:'Name of Post',category:'Category (as per 100-point roster)',roa:'ROA Authenticated by BCW Deptt?',
-  sanctionMemo:'Post Sanctioning Memo / Approval copy',court:'Court case pending?'};
-const VAC_FIELDS_T=['cause','outgoing','other','date','qual','medium','section','reserv','roster','gender','remark'];
-const VAC_FIELDS_N=['postName','cause','outgoing','other','date','roster','category','roa','sanctionMemo','court','remark'];
+  sanctionMemo:'Post Sanctioning Memo No. / Approval copy',court:'Court case pending?'};
+const VAC_FIELDS_T=['cause','outgoing','other','eventDate','sanctionMemo','sanctionDate','date','qual','medium','section','reserv','roster','gender','remark'];
+const VAC_FIELDS_N=['postName','cause','outgoing','other','eventDate','sanctionMemo','sanctionDate','date','roster','category','roa','court','remark'];
 
 /* Verbatim enclosure lists printed on the D.I. formats */
 const VAC_TEACH_ENCL=[
@@ -1649,13 +1649,23 @@ function vacParse(p){
 }
 function vacGet(p){
   const d=vacParse(p);
-  const base={cause:d.cause,outgoing:d.outgoing,date:d.date,other:d.other,remark:'',qual:'',medium:vacNormMedium(p.medium),section:p.sec==='HS'?'HS':'',
+  const base={cause:d.cause,outgoing:d.outgoing,eventDate:d.date,date:'',sanctionDate:'',other:d.other,remark:'',qual:'',medium:vacNormMedium(p.medium),section:p.sec==='HS'?'HS':'',
     reserv:'',roster:'',gender:'',postName:p.sec==='LIBRARIAN'?'Librarian':p.sec==='CLERK'?'Clerk':"Gr.'D'",category:'',roa:'',sanctionMemo:'',court:''};
-  return Object.assign(base, vacExtra[vacKey(p)]||{});
+  const m=Object.assign(base, vacExtra[vacKey(p)]||{});
+  if(!m.date) m.date = m.cause==='Creation of New Post' ? (vacNormDate(m.sanctionDate)||m.sanctionDate||'') : vacNextDay(m.eventDate);
+  return m;
+}
+function vacNextDay(s){
+  const m=String(s||'').match(/(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{2,4})/); if(!m) return '';
+  let y=+m[3]; if(y<100) y+=2000;
+  const d=new Date(Date.UTC(y,+m[2]-1,+m[1]+1));
+  return String(d.getUTCDate()).padStart(2,'0')+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+d.getUTCFullYear();
 }
 function vacSet(id,key,val){
   const p=staffData.find(x=>x.id===id); if(!p) return;
-  const k=vacKey(p); vacExtra[k]=vacExtra[k]||{}; vacExtra[k][key]=val; vacSaveLocal(); renderVacDoc();
+  const k=vacKey(p); vacExtra[k]=vacExtra[k]||{}; vacExtra[k][key]=val; vacSaveLocal();
+  if(key!=='date' && ['eventDate','sanctionDate','cause'].includes(key)){ if(vacExtra[k].date===''||vacExtra[k].date===undefined||true){ delete vacExtra[k].date; vacSaveLocal(); const e=document.getElementById('vf_'+p.id+'_date'); if(e) e.value=vacGet(p).date; } }
+  renderVacDoc();
 }
 function vacSetSchool(key,val){ vacSchool[key]=val; vacSaveLocal();
   if(key==='type'){ ['vacTypeTop','vacSF_type'].forEach(i=>{ const e=document.getElementById(i); if(e) e.value=val; }); }
@@ -1701,8 +1711,8 @@ function renderVacSelection(){
 }
 function vacField(p,x,key){
   const o=VAC_OPT[key], v=x[key]||'';
-  const ctl=o?`<select onchange="vacSet(${p.id},'${key}',this.value)">${o.map(z=>`<option value="${vesc(z)}" ${z===v?'selected':''}>${z||'-- select --'}</option>`).join('')}</select>`
-    :`<input type="text" value="${vesc(v)}" oninput="vacSet(${p.id},'${key}',this.value)">`;
+  const ctl=o?`<select id="vf_${p.id}_${key}" onchange="vacSet(${p.id},'${key}',this.value)">${o.map(z=>`<option value="${vesc(z)}" ${z===v?'selected':''}>${z||'-- select --'}</option>`).join('')}</select>`
+    :`<input type="text" id="vf_${p.id}_${key}" value="${vesc(v)}" oninput="vacSet(${p.id},'${key}',this.value)">`;
   return `<div><label style="display:block;font-size:11px;margin-bottom:3px;">${VAC_LABEL[key]}</label>${ctl}</div>`;
 }
 function renderVacForms(){
@@ -1717,24 +1727,20 @@ function renderVacForms(){
 }
 
 /* ---------- text helpers ---------- */
-function vacCauseUpper(x){
-  if(x.cause==='Creation of New Post') return 'CREATION OF NEW POST';
-  if(x.cause==='Other') return x.other||'';
-  if(!x.cause) return '';
-  return x.cause.toUpperCase()+(x.outgoing?' OF '+x.outgoing.toUpperCase():'');
-}
+function vacMemoText(x){ return x.sanctionMemo?(x.sanctionMemo+(x.sanctionDate?' dated '+x.sanctionDate:'')):(x.sanctionDate?('dated '+x.sanctionDate):''); }
 function vacReason(x){
-  if(x.cause==='Creation of New Post') return 'Creation of new post';
+  if(x.cause==='Creation of New Post'){ const m=vacMemoText(x); return 'Creation of new post'+(m?' vide Memo No. '+m:''); }
   if(x.cause==='Other') return x.other||'';
   if(!x.cause) return '';
-  return x.cause+(x.outgoing?' of '+x.outgoing:'');
+  return x.cause+(x.outgoing?' of '+x.outgoing:'')+(x.eventDate?' on '+x.eventDate:'');
 }
+function vacCauseUpper(x){ return vacReason(x).toUpperCase(); }
 function vacBasisSentence(x){
-  const who=x.outgoing||'the out-going incumbent', dt=x.date?(' on '+x.date):'';
+  const who=x.outgoing||'the out-going incumbent', dt=x.eventDate?(' on '+x.eventDate):'';
   if(x.cause==='Retirement') return 'retirement of '+who+dt;
   if(x.cause==='Resignation') return 'resignation of '+who+dt;
   if(x.cause==='Death') return 'death of '+who+dt;
-  if(x.cause==='Creation of New Post') return 'creation of a new post'+(x.sanctionMemo?(' vide '+x.sanctionMemo):'');
+  if(x.cause==='Creation of New Post'){ const m=vacMemoText(x); return 'creation of a new post'+(m?' vide Memo No. '+m:''); }
   return x.other||'';
 }
 function vacEnclosures(cat,list){
@@ -1814,7 +1820,7 @@ function vacNonTeachingStmt(list){
   const s=vacSchool;
   const rows=list.map((p,i)=>{ const x=vacGet(p);
     return `<tr><td class="n">${i+1}</td><td class="v">${vacBlank(x.postName)}</td><td class="v">${vacBlank(x.date)}</td><td class="v">${vacBlank(vacReason(x))}</td><td class="v">${vacBlank(x.roster)}</td><td class="v">${vacBlank(x.category)}</td>
-      <td class="v">${vacBlank(x.roa)}</td><td class="v">${vacBlank(x.sanctionMemo)}</td><td class="v">${vacBlank(x.court)}</td><td class="v">${vacBlank(x.remark)}</td></tr>`; }).join('');
+      <td class="v">${vacBlank(x.roa)}</td><td class="v">${vacBlank(vacMemoText(x))}</td><td class="v">${vacBlank(x.court)}</td><td class="v">${vacBlank(x.remark)}</td></tr>`; }).join('');
   return `<div class="vac-page vac-land" style="font-size:12px;">
     <div style="text-align:center;font-weight:700;font-size:15px;text-decoration:underline;margin-bottom:8px;">Vacancy Format ( For Non-Teaching)</div>
     <div style="display:flex;justify-content:space-between;"><span>Name of the School : <b class="vac-fillb">${vesc(s.name)}</b></span><span>Name of the Block:- <b class="vac-fillb">${vesc(s.block)}</b></span></div>
